@@ -1,0 +1,30 @@
+{
+  "name": "slackbot-archer",
+  "version": "1.0.0",
+  "description": "\"Literally the greatest secret agent EVER! And yes, that was the correct usage of literally. Now literally go and fetch me a a bloody mary, 2 olives. I can't find Woodhouse anywhere!\"",
+  "main": "token.js",
+  "bin": {
+    "slackbot-archer": "bot.js"
+  },
+  "dependencies": {
+    "slackbots": "^0.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "[\"Archer\"",
+    "\"Kenny",
+    "Loggins\"",
+    "\"Danger",
+    "Zone\"",
+    "\"Lana\"",
+    "\"Woodhouse\"",
+    "\"Mallory\"",
+    "\"phrasing\"",
+    "\"Pam\"]"
+  ],
+  "author": "Cam",
+  "license": "ISC"
+}
