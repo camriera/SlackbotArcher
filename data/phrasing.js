@@ -137,15 +137,6 @@ var verbs = {
   'come':3
 };
 
-var canned_responses = [
-  'I swear to god I had something for this.',
-  'Uh... Phrasing!',
-  'PHRASING!',
-  'Oh. My. God. Hello? Are we still doing PHRASING?!',
-  "Jesus, Phrasing!",
-  'Why are we not still doing phrasing?'
-];
-
 var countPhrasingScore = function(msg){
   var words = msg.split(' ');
   var pointVal = 0;
@@ -163,5 +154,4 @@ module.exports = {
   nouns: nouns,
   verbs: verbs,
   phrasingScore: countPhrasingScore,
-  responses: canned_responses
 };

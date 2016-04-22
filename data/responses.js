@@ -24,17 +24,31 @@ var dangerZone = [
 
 var cantWont = ['Can\'t or won\'t?'];
 
-var nameReferenceResponses = [
+var random = [
   'I’m not saying I invented the turtleneck, but I was the first person to realise its potential as a tactical garment. The tactical turtleneck! The… tactleneck.',
-  'For I am a sinner in the hands of an angry God. Bloody Mary, full of vodka, blessed are you among cocktails. Pray for me now and at the hour of my death, which I hope is soon. Amen',
   'Are you kidding? Dude. Bros before apparent threats to national security.',
   'Hey, we\'re out here risking our lives every—many of the days!',
-  'Lying is like 95% of what I do.'
-  'Karate? The Dane Cook of martial arts? No, ISIS agents use Krav Maga.'
-  'Hey, I am everybody\'s type.'
+  'Lying is like 95% of what I do.',
+  'Karate? The Dane Cook of martial arts? No, ISIS agents use Krav Maga.',
+  'Hey, I am everybody\'s type.',
+  'A little of Column \'A\', a little of Column \'B\'.',
+  'Do you want ants? Because that\'s how you get ants.',
+  'WOOOOO!!!!!',
+  'READ A BOOK!',
+  'https://giphy.com/gifs/archer-sterling-archeredit-10Eb8nuefwUGLm',
+  'https://giphy.com/gifs/archer-sterling-archeredit-mE39UI0Ho8K5O',
+  'https://giphy.com/gifs/archer-sterling-archeredit-eGEojmj0cc37y',
+  'https://giphy.com/gifs/drinking-archer-n0SYZLVDpJ1ZK',
+  'https://giphy.com/gifs/archer-sterling-archeredit-LfCsyBOyVu3ra',
+  'http://giphy.com/gifs/angry-drunk-archer-11sV0mwXMM5sJi',
+  'http://giphy.com/gifs/archer-sterling-D6FQLH3DK4lPO',
+  'http://giphy.com/gifs/archer-5-a4vbP6DrvOvfy'
 ];
 
 
 module.exports = {
-
+  phrasing: phrasing,
+  dangerZone: dangerZone,
+  cantWont: cantWont,
+  random: random
 };
