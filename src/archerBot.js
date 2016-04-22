@@ -8,11 +8,17 @@ var Bot = require('slackbots');
 
 const PHRASING_TRIGGER_POINT_VAL = 12;
 var CANT_WONT_REGEXP = (/(i|we)\s(cant|can't)/ig);
-var joinedUser = '';
+var JOIN_RESPONSE = (/.*(wha+t|yes|shut.*up|wut|no).*/ig);
+
+var newUser = {
+  name: '',
+  joined: false,
+  responded: false
+};
 
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
-  this.settings.name = this.settings.name || '@archer';
+  this.settings.name = this.settings.name || 'archer';
   //this.dbPath = settings.dbPath || path.resolve(process.cwd(), 'data', 'archerbot.db');
 
   this.user = null;
@@ -52,12 +58,14 @@ ArcherBot.prototype._onStart = function () {
 ArcherBot.prototype._onMessage = function (message) {
   console.log(message);
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
-    //if(this._isReplyFromJustJoinedUser(message)){
-    //  if((/wha+t/ig).test(message.text)){
-    //    this._postMessage(message, pickRandom(responses.dangerZone));
-    //  }
-    //  joinedUser = '';
-    //}
+    if(this._isReplyFromJustJoinedUser(message)){
+      if(JOIN_RESPONSE.test(message.text)){
+        this._postMessage(message, pickRandom(responses.dangerZone));
+      }
+      newUser.joined = false;
+      newUser.responded = false;
+      newUser.name = '';
+    }
     if (this._isMentioningArcher(message)) {
       this._postMessage(message, pickRandom(responses.random));
     }
@@ -68,10 +76,16 @@ ArcherBot.prototype._onMessage = function (message) {
       this._postMessage(message, pickRandom(responses.phrasing));
     }
   }
-  // else if (this._isChannelJoin(message)){
-  //  var channelName = this._getChannelNameFromMessageText(message);
-  //  this._replyWithDangerZoneDiatribe(message, channelName);
-  //}
+  //User joins channel
+  else if (this._isChannelJoin(message)){
+    newUser.joined = true;
+    this._replyWithDangerZoneDiatribe(message, this._getChannelFromMessageText(message));
+  }
+  //user joins group
+  else if( this._isGroupJoin(message)){
+    newUser.joined = true;
+    this._replyWithDangerZoneDiatribe(message, this._getGroupFromMessageText(message));
+  }
 };
 
 /**
@@ -95,16 +109,22 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
 };
 
 ArcherBot.prototype._isReplyFromJustJoinedUser = function (message) {
-  return message.user === joinedUser.name;
+  return message.user === newUser.name;
 };
 
-ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, channelName) {
+ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, channelOrGroup) {
   var self = this;
-  var name = originalMessage.user.profile.first_name || originalMessage.user.name;
+  var user = self._getUserById(originalMessage.user);
+  var name = user.profile.first_name || user.name;
   var replyCount = 0;
-  while(replyCount < 3) {
+  while(replyCount < 3 && !newUser.responded) {
     setTimeout(function () {
-      self.postMessageToChannel(channelName, repeatName(name, replyCount), {as_user: true});
+      if(channelOrGroup.id[0] === 'C') {
+        self.postMessageToChannel(channelOrGroup.name, repeatName(name, replyCount), {as_user: true});
+      }
+      else if(channelOrGroup.id[0] === 'G'){
+        self.postMessageToGroup(channelOrGroup.name, repeatName(name, replyCount), {as_user: true});
+      }
       replyCount++;
     }, 2000);
   }
@@ -176,6 +196,38 @@ ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
       this._isGroupConversation(message);
 };
 
+/**
+ * Gets the channel by the name from the message text field
+ * @param message
+ * @returns {T|*|null}
+ * @private
+ */
+ArcherBot.prototype._getChannelFromMessageText = function (message) {
+  var self = this;
+
+  var channel = self.getChannels().filter(function (channel) {
+    var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
+    return channelRegexp.test(message.text);
+  })[0];
+
+  return channel || null;
+};
+
+/**
+ * Gets the group by the name from the message text field
+ * @param message
+ * @returns {T|*|null}
+ * @private
+ */
+ArcherBot.prototype._getGroupFromMessageText = function (message) {
+  var self = this;
+  var group = self.getGroups().filter(function (group) {
+    var groupRegexp = new RegExp('\\{' + group.name + '\\}', 'gi');
+    return groupRegexp.test(message.text);
+  })[0];
+
+  return group || null;
+};
 
 /**
  * Util function to post message either to channel or group
@@ -194,7 +246,6 @@ ArcherBot.prototype._postMessage = function (originalMessage, response) {
   }
 };
 
-
 /**
  * Util function to check if a given real time message object is because of a channel_join event
  * @param {object} message
@@ -204,7 +255,7 @@ ArcherBot.prototype._postMessage = function (originalMessage, response) {
 ArcherBot.prototype._isChannelJoin = function (message) {
   var isJoinedBotChannel = false;
   if(message.subtype === 'channel_join') {
-    this.channels.forEach(function (channel) {
+    this.getChannels().forEach(function (channel) {
       var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
       if (channelRegexp.test(message.text)){
         isJoinedBotChannel = true;
@@ -215,19 +266,23 @@ ArcherBot.prototype._isChannelJoin = function (message) {
 };
 
 /**
- * Util function to pull the channel name out of the message text during from a channel_join event
+ * Util function to check if a group_join
  * @param message
- * @returns {*}
+ * @returns {boolean}
  * @private
  */
-ArcherBot.prototype._getChannelNameFromMessageText = function (message) {
-  var self = this;
-  return self.channels.filter(function (channel) {
-    var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
-    return channelRegexp.test(message.text);
-  })[0].name;
+ArcherBot.prototype._isGroupJoin = function (message) {
+  var isJoinedBotGroup = false;
+  if(message.subtype === 'group_join') {
+    this.getGroups().forEach(function (group) {
+      var groupRegexp = new RegExp('\\{' + group.name + '\\}', 'gi');
+      if (groupRegexp.test(message.text)){
+        isJoinedBotGroup = true;
+      };
+    });
+  }
+  return isJoinedBotGroup;
 };
-
 
 /**
  * Util function to check if a given real time message is mentioning Chuck Norris or the norrisbot
@@ -263,9 +318,28 @@ ArcherBot.prototype._getChannelById = function (channelId) {
   })[0];
 };
 
+/**
+ * Util function to get the group by its id
+ * @param groupId
+ * @returns {T|*}
+ * @private
+ */
 ArcherBot.prototype._getGroupById = function (groupId) {
   return this.groups.filter(function (item) {
     return item.id === groupId;
+  })[0];
+};
+
+
+/**
+ * Util function to get the user by its id
+ * @param userId
+ * @returns {T|*}
+ * @private
+ */
+ArcherBot.prototype._getUserById = function (userId){
+  return this.users.filter(function (user) {
+    return user.id === userId;
   })[0];
 };
 
