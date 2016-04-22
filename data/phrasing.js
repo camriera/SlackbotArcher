@@ -85,7 +85,6 @@ var nouns = {
   'mouth': 3,
   'tongue': 3,
   'butt': 3,
-
   'member': 2,
   'hair': 1,
   'head': 3,
@@ -94,6 +93,10 @@ var nouns = {
   'rod': 4,
   'staff': 4,
   'flower': 3,
+  'joystick': 5,
+  'flute': 4,
+  'skin': 4,
+  'snake': 5,
 };
 
 var verbs = {
@@ -134,7 +137,13 @@ var verbs = {
   'spurt': 6,
   'explode': 6,
   'came':3,
-  'come':3
+  'come':3,
+  'ooze': 3,
+  'pull': 5,
+  'tug': 5,
+  'jack': 5,
+  'jerk': 5,
+  'grind': 4,
 };
 
 var countPhrasingScore = function(msg){

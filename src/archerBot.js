@@ -6,9 +6,9 @@ var phrasing = require('../data/phrasing');
 var responses = require('../data/responses')
 var Bot = require('slackbots');
 
-var CHANNEL_NAME_REGEXP = new RegExp(/the-danger-zone/ig);
-var CANT_WONT_REGEXP = new RegExp(/(i|we)\s(cant|can\'t)/gi);
 const PHRASING_TRIGGER_POINT_VAL = 12;
+var CANT_WONT_REGEXP = new RegExp(/(i|we)\s(cant|can\'t)/, 'ig');
+var joinedUser = '';
 
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
@@ -32,6 +32,7 @@ ArcherBot.prototype.run = function () {
 
   this.on('start', this._onStart);
   this.on('message', this._onMessage);
+  this.on('message', this._onChannelJoin);
 };
 
 /**
@@ -52,10 +53,10 @@ ArcherBot.prototype._onStart = function () {
  */
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelConversation(message) && !this._isFromArcherBot(message)) {
-    //if(this._isReplyFromJustJoinedUser(message)){
-    //  this._replyWithDangerZoneResponse(message);
-    //}
-    if(this._isMentioningArcher(message)){
+    if(this._isReplyFromJustJoinedUser(message)){
+
+    }
+    else if(this._isMentioningArcher(message)){
       this._replyWithRandomResponse(message);
     }
     else if(this._isTriggerCantWont(message)){
@@ -64,21 +65,11 @@ ArcherBot.prototype._onMessage = function (message) {
     else if(this._isTriggerPhrasingResponse(message)) {
       this._replyWithRandomPhrasing(message);
     }
+  } else if (this._isChannelJoin(message)){
+    var channelName = this._getChannelNameFromMessageText(message);
+    this._replyWithDangerZoneDiatribe(message, channelName);
   }
 };
-
-/**
- * On Channel Join, called when a channel_join subtype is detected for the channel archer is subscribed to
- * @param message
- * @returns {boolean}
- * @private
- */
-//var joinedUser = '';
-//ArcherBot.prototype._onChannelJoin = function (message) {
-//  if(this._isChannelJoin(message) && this._isArcherHasChannel(message)){
-//    this._replyWithDangerZoneDiatribe(message);
-//  }
-//};
 
 ArcherBot.prototype._isTriggerPhrasingResponse = function (message) {
   return phrasing.phrasingScore(message.text) >= PHRASING_TRIGGER_POINT_VAL;
@@ -101,14 +92,22 @@ ArcherBot.prototype._replyWithCantOrWont = function (originalMessage) {
   self.postMessageToChannel(channel.name, 'Can\'t or won\'t?', {as_user: true});
 };
 
-ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage) {
+ArcherBot.prototype._isReplyFromJustJoinedUser = function (message) {
   var self = this;
-  var name = message.user.profile.first_name || message.user.name;
-  var channel = self._getChannelById(originalMessage.channel);
-  var replyCount = 0; //TODO remove after implementing isReplyFromJustJoinedUser logic
+  if((/wha+t/ig).test(message.text)){
+    var channel = self._getChannelById(originalMessage.channel);
+    self.postMessageToChannel(channel.name, responses.dangerZone, {as_user: true});
+  }
+  joinedUser = '';
+};
+
+ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, channelName) {
+  var self = this;
+  var name = originalMessage.user.profile.first_name || originalMessage.user.name;
+  var replyCount = 0;
   while(replyCount < 3) {
     setTimeout(function () {
-      self.postMessageToChannel(channel.name, repeatName(name, replyCount), {as_user: true});
+      self.postMessageToChannel(channelName, repeatName(name, replyCount), {as_user: true});
       replyCount++;
     }, 2000);
   }
@@ -227,14 +226,38 @@ ArcherBot.prototype._isChannelConversation = function (message) {
 };
 
 /**
- * Util function to check if a given real time message object is because of a channel_join evtg
+ * Util function to check if a given real time message object is because of a channel_join event
  * @param {object} message
  * @returns {boolean}
  * @private
  */
 ArcherBot.prototype._isChannelJoin = function (message) {
-  return message.subtype === 'channel_join' && CHANNEL_NAME_REGEXP.test(message.text);
+  var isJoinedBotChannel = false;
+  if(message.subtype === 'channel_join') {
+    this.channels.forEach(function (channel) {
+      var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
+      if (channelRegexp.test(message.text)){
+        isJoinedBotChannel = true;
+      };
+    });
+  }
+  return isJoinedBotChannel;
 };
+
+/**
+ * Util function to pull the channel name out of the message text during from a channel_join event
+ * @param message
+ * @returns {*}
+ * @private
+ */
+ArcherBot.prototype._getChannelNameFromMessageText = function (message) {
+  var self = this;
+  return self.channels.filter(function (channel) {
+    var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
+    return channelRegexp.test(message.text);
+  })[0].name;
+};
+
 
 /**
  * Util function to check if a given real time message is mentioning Chuck Norris or the norrisbot
