@@ -6,7 +6,7 @@ var phrasing = require('../data/phrasing');
 var responses = require('../data/responses')
 var Bot = require('slackbots');
 
-const PHRASING_TRIGGER_POINT_VAL = 12;
+const PHRASING_TRIGGER_POINT_VAL = 10;
 var CANT_WONT_REGEXP = (/(i|we)\s(cant|can't)/ig);
 var JOIN_RESPONSE = (/.*(wha+t|yes|shut.*up|wut|no).*/ig);
 
@@ -45,9 +45,10 @@ ArcherBot.prototype.run = function () {
 ArcherBot.prototype._onStart = function () {
   this._loadBotUser();
   console.log('archer bot: ' + this.user);
+  this._welcomeMessage();
+
   //this._connectDb();
   //this._firstRunCheck();
-  //this._welcomeMessage();
 };
 
 /**
@@ -56,10 +57,12 @@ ArcherBot.prototype._onStart = function () {
  * @private
  */
 ArcherBot.prototype._onMessage = function (message) {
-  console.log(message);
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
-    if(this._isReplyFromJustJoinedUser(message)){
-      if(JOIN_RESPONSE.test(message.text)){
+
+    console.log(message);
+
+    if (this._isReplyFromJustJoinedUser(message)) {
+      if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.dangerZone));
       }
       newUser.joined = false;
@@ -75,16 +78,17 @@ ArcherBot.prototype._onMessage = function (message) {
     else if (this._isTriggerPhrasingResponse(message)) {
       this._postMessage(message, pickRandom(responses.phrasing));
     }
-  }
-  //User joins channel
-  else if (this._isChannelJoin(message)){
-    newUser.joined = true;
-    this._replyWithDangerZoneDiatribe(message, this._getChannelFromMessageText(message));
-  }
-  //user joins group
-  else if( this._isGroupJoin(message)){
-    newUser.joined = true;
-    this._replyWithDangerZoneDiatribe(message, this._getGroupFromMessageText(message));
+    //User joins channel
+    else if (this._isChannelJoin(message)) {
+      newUser.joined = true;
+      this._replyWithDangerZoneDiatribe(message);
+    }
+    //user joins group
+    else if (this._isGroupJoin(message)) {
+      console.log('user '+message.user+ ' joined group ' + message.channel);
+      newUser.joined = true;
+      this._replyWithDangerZoneDiatribe(message);
+    }
   }
 };
 
@@ -112,18 +116,21 @@ ArcherBot.prototype._isReplyFromJustJoinedUser = function (message) {
   return message.user === newUser.name;
 };
 
-ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, channelOrGroup) {
+ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage) {
+  console.log('Running danger zone diatribe');
   var self = this;
   var user = self._getUserById(originalMessage.user);
   var name = user.profile.first_name || user.name;
   var replyCount = 0;
   while(replyCount < 3 && !newUser.responded) {
     setTimeout(function () {
-      if(channelOrGroup.id[0] === 'C') {
-        self.postMessageToChannel(channelOrGroup.name, repeatName(name, replyCount), {as_user: true});
+      if(originalMessage.channel[0] === 'C') {
+        var channel = this._getChannelById(originalMessage.channel);
+        self.postMessageToChannel(channel.name, repeatName(name, replyCount), {as_user: true});
       }
-      else if(channelOrGroup.id[0] === 'G'){
-        self.postMessageToGroup(channelOrGroup.name, repeatName(name, replyCount), {as_user: true});
+      else if(originalMessage.channel[0] === 'G'){
+        var group = this._getChannelById(originalMessage.channel);
+        self.postMessageToGroup(channel.name, repeatName(name, replyCount), {as_user: true});
       }
       replyCount++;
     }, 2000);
@@ -147,12 +154,17 @@ ArcherBot.prototype._loadBotUser = function () {
  * @private
  */
 ArcherBot.prototype._welcomeMessage = function () {
-  console.log('replying with welcome message to channel ' + this.channels[0].name);
-  console.log('replying with welcome message to group' + this.groups[0].name);
   var response = 'Was anyone looking for the worlds greatest secret agent?' +
       '\n If not, just say my name `' + this.name + '` and I\'ll be there... or not. Its not like I\'m your servant like Woodhouse';
-  this._postMessage(this.channels[0].name, response);
-  this._postMessage(this.groups[0].name, response);
+
+  if(this.channels.length){
+    console.log('replying with welcome message to channel ' + this.channels[0].name);
+    this._postMessage(this.channels[0].name, response);
+  }
+  if(this.groups.length){
+    console.log('replying with welcome message to group' + this.groups[0].name);
+    this._postMessage(this.groups[0].name, response);
+  }
 };
 
 /**
@@ -197,39 +209,6 @@ ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
 };
 
 /**
- * Gets the channel by the name from the message text field
- * @param message
- * @returns {T|*|null}
- * @private
- */
-ArcherBot.prototype._getChannelFromMessageText = function (message) {
-  var self = this;
-
-  var channel = self.getChannels().filter(function (channel) {
-    var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
-    return channelRegexp.test(message.text);
-  })[0];
-
-  return channel || null;
-};
-
-/**
- * Gets the group by the name from the message text field
- * @param message
- * @returns {T|*|null}
- * @private
- */
-ArcherBot.prototype._getGroupFromMessageText = function (message) {
-  var self = this;
-  var group = self.getGroups().filter(function (group) {
-    var groupRegexp = new RegExp('\\{' + group.name + '\\}', 'gi');
-    return groupRegexp.test(message.text);
-  })[0];
-
-  return group || null;
-};
-
-/**
  * Util function to post message either to channel or group
  * @param originalMessage
  * @param response
@@ -255,11 +234,10 @@ ArcherBot.prototype._postMessage = function (originalMessage, response) {
 ArcherBot.prototype._isChannelJoin = function (message) {
   var isJoinedBotChannel = false;
   if(message.subtype === 'channel_join') {
-    this.getChannels().forEach(function (channel) {
-      var channelRegexp = new RegExp('\\{' + channel.name + '\\}', 'gi');
-      if (channelRegexp.test(message.text)){
+    this.channels.forEach(function (channel) {
+      if (message.channel === channel.id){
         isJoinedBotChannel = true;
-      };
+      }
     });
   }
   return isJoinedBotChannel;
@@ -274,11 +252,10 @@ ArcherBot.prototype._isChannelJoin = function (message) {
 ArcherBot.prototype._isGroupJoin = function (message) {
   var isJoinedBotGroup = false;
   if(message.subtype === 'group_join') {
-    this.getGroups().forEach(function (group) {
-      var groupRegexp = new RegExp('\\{' + group.name + '\\}', 'gi');
-      if (groupRegexp.test(message.text)){
+    this.groups.forEach(function (group) {
+      if(group.id === message.channel){
         isJoinedBotGroup = true;
-      };
+      }
     });
   }
   return isJoinedBotGroup;
@@ -361,6 +338,7 @@ function repeatName(name, replyCount){
     default:
       response = name;
   }
+  console.log('replying with users name' + response);
   return response;
 }
 
