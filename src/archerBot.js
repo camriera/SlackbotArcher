@@ -7,11 +7,12 @@ var responses = require('../data/responses')
 var Bot = require('slackbots');
 
 const PHRASING_TRIGGER_POINT_VAL = 10;
-var CANT_WONT_REGEXP = (/(i|we)\s(cant|can't)/ig);
-var JOIN_RESPONSE = (/.*(wha+t|yes|shut.*up|wut|no).*/ig);
+var CANT_WONT_REGEXP = (/(i|we)\s(cant|can\'t)/ig);
+var JOIN_RESPONSE = (/wh*?a+t|yes|yeah?|shut.*up|wu+t|no/ig);
+var VOWEL_REGEXP = /a|e|i|o|u|y/ig;
 
 var newUser = {
-  name: '',
+  id: '',
   joined: false,
   responded: false
 };
@@ -58,35 +59,30 @@ ArcherBot.prototype._onStart = function () {
  */
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
-
     console.log(message);
-
     if (this._isReplyFromJustJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.dangerZone));
+        newUser.joined = false;
+        newUser.responded = true;
+        newUser.id = '';
       }
-      newUser.joined = false;
-      newUser.responded = false;
-      newUser.name = '';
     }
-    if (this._isMentioningArcher(message)) {
+    else if (this._isMentioningArcher(message)) {
       this._postMessage(message, pickRandom(responses.random));
     }
     else if (this._isTriggerCantWont(message)) {
-      this._postMessage(message, 'Can\'t or won\'t?');
+      this._postMessage(message, responses.cantWont);
     }
     else if (this._isTriggerPhrasingResponse(message)) {
       this._postMessage(message, pickRandom(responses.phrasing));
     }
-    //User joins channel
-    else if (this._isChannelJoin(message)) {
+    //User joins channel or group
+    else if (this._isChannelJoin(message) || this._isGroupJoin(message)) {
+      console.log('user '+message.user+ ' joined channel/group' + message.channel);
       newUser.joined = true;
-      this._replyWithDangerZoneDiatribe(message);
-    }
-    //user joins group
-    else if (this._isGroupJoin(message)) {
-      console.log('user '+message.user+ ' joined group ' + message.channel);
-      newUser.joined = true;
+      newUser.id = message.user;
+      newUser.responded = false;
       this._replyWithDangerZoneDiatribe(message);
     }
   }
@@ -112,29 +108,33 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
   return CANT_WONT_REGEXP.test(message.text);
 };
 
+/**
+ * Checks whether the newest joined user replied to the group/channel for use in danger zone diatribe
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
 ArcherBot.prototype._isReplyFromJustJoinedUser = function (message) {
-  return message.user === newUser.name;
+  return message.user === newUser.id;
 };
 
-ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage) {
-  console.log('Running danger zone diatribe');
+/**
+ * Replies with the danger zone Lana like diatribe using the users name who just joined the channel/group
+ * @param originalMessage
+ * @private
+ */
+ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, replyCount) {
   var self = this;
   var user = self._getUserById(originalMessage.user);
   var name = user.profile.first_name || user.name;
-  var replyCount = 0;
-  while(replyCount < 3 && !newUser.responded) {
-    setTimeout(function () {
-      if(originalMessage.channel[0] === 'C') {
-        var channel = this._getChannelById(originalMessage.channel);
-        self.postMessageToChannel(channel.name, repeatName(name, replyCount), {as_user: true});
-      }
-      else if(originalMessage.channel[0] === 'G'){
-        var group = this._getChannelById(originalMessage.channel);
-        self.postMessageToGroup(channel.name, repeatName(name, replyCount), {as_user: true});
-      }
-      replyCount++;
-    }, 2000);
+  replyCount = replyCount || 0;
+  if(replyCount > 3 || newUser.responded){
+    return;
   }
+  var increment = replyCount + 1;
+  setTimeout(function () {
+    self._postMessage(originalMessage, repeatName(name, replyCount), self._replyWithDangerZoneDiatribe(originalMessage, increment));
+  }, 2000);
 };
 
 /**
@@ -146,24 +146,19 @@ ArcherBot.prototype._loadBotUser = function () {
   this.user = this.users.filter(function (user) {
     return user.name === self.name;
   })[0];
+  console.log('Bot details: '+this.user);
 };
-
 
 /**
  * Sends a welcome message in the channel
  * @private
  */
 ArcherBot.prototype._welcomeMessage = function () {
-  var response = 'Was anyone looking for the worlds greatest secret agent?' +
-      '\n If not, just say my name `' + this.name + '` and I\'ll be there... or not. Its not like I\'m your servant like Woodhouse';
-
   if(this.channels.length){
-    console.log('replying with welcome message to channel ' + this.channels[0].name);
-    this._postMessage(this.channels[0].name, response);
+    this._postMessage({type: 'message', channel: this.channels[0].name}, responses.welcome);
   }
   if(this.groups.length){
-    console.log('replying with welcome message to group' + this.groups[0].name);
-    this._postMessage(this.groups[0].name, response);
+    this._postMessage({type: 'message', channel: this.groups[0].name}, responses.welcome);
   }
 };
 
@@ -214,14 +209,15 @@ ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
  * @param response
  * @private
  */
-ArcherBot.prototype._postMessage = function (originalMessage, response) {
+ArcherBot.prototype._postMessage = function (originalMessage, response, callback) {
+  //console.log('posting message to ' +originalMessage.channel + ' - ' + response);
   if(this._isChannelConversation(originalMessage)){
     var channel = this._getChannelById(originalMessage.channel);
     this.postMessageToChannel(channel.name, response, {as_user: true});
   }
   if(this._isGroupConversation(originalMessage)){
     var group = this._getGroupById(originalMessage.channel);
-    this.postMessageToGroup(group.name, response, {as_user: true});
+    this.postMessageToGroup(group.name, response, {as_user: true}, callback);
   }
 };
 
@@ -268,8 +264,9 @@ ArcherBot.prototype._isGroupJoin = function (message) {
  * @private
  */
 ArcherBot.prototype._isMentioningArcher = function (message) {
-  return message.text.toLowerCase().indexOf('archer') > -1 ||
-      message.text.toLowerCase().indexOf('sterling') > -1 ||
+  return message.text.indexOf(this.user.id) > -1 ||
+    message.text.toLowerCase().indexOf('archer') > -1 ||
+    message.text.toLowerCase().indexOf('sterling') > -1 ||
     message.text.toLowerCase().indexOf(this.name) > -1;
 };
 
@@ -338,7 +335,7 @@ function repeatName(name, replyCount){
     default:
       response = name;
   }
-  console.log('replying with users name' + response);
+  console.log('replying with users name: ' + response);
   return response;
 }
 
@@ -348,21 +345,21 @@ function pickRandom(list) {
 }
 
 function yellName(name) {
-  var VOWEL_REGEXP = /(a|e|i|o|u|y)/ig;
-
-  var lastVowelIndex;
-  var vowel;
+  if(!name || name.length < 2){
+    return;
+  }
+  var lastVowelIndex, vowelToExpand;
   for(var i = name.length-1; i > 0; i--){
     if(VOWEL_REGEXP.test(name.charAt(i))){
       lastVowelIndex = i;
-      vowel = name.charAt(i);
+      vowelToExpand = name.charAt(i);
       break;
     }
   }
   var nameBegin = name.slice(0, lastVowelIndex);
   var nameEnd = name.slice(lastVowelIndex, name.length);
 
-  name = nameBegin + vowel.repeat(5) + nameEnd + '!';
+  name = nameBegin + vowelToExpand.repeat(5) + nameEnd + '!';
   return name.toUpperCase();
 }
 

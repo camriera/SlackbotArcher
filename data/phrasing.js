@@ -11,14 +11,14 @@ var adjectives = {
   'creamy': 5,
   'tight': 4,
   'loose': 4,
-  'swollen': 7,
-  'veiny': 7,
+  'swollen': 8,
+  'veiny': 8,
   'salty': 5,
-  'juicy': 5,
+  'juicy': 6,
   'wet': 5,
   'moist': 7,
   'frothy': 7,
-  'hot': 2,
+  'hot': 4,
   'dripping': 5,
   'soaking': 4,
   'dirty': 3,
@@ -27,21 +27,21 @@ var adjectives = {
   'slutty': 5,
   'naughty': 4,
   'stanky': 4,
-  'sweaty': 3,
-  'orgasmic': 7,
+  'sweaty': 5,
+  'orgasmic': 8,
   'horny': 8,
   'musky': 5,
   'steamy': 4,
   'bad': 3,
   'tasty': 3,
   'dead':1,
-  'sexy': 4,
-  'black': 3,
-  'dry': 2,
+  'sexy': 5,
+  'black': 4,
+  'dry': 3,
   'drunk': 3,
-  'round': 3,
-  'big': 3,
-  'large': 2,
+  'round': 4,
+  'big': 5,
+  'large': 4,
   'thin': 2,
   'purple': 2,
   'blonde': 5,
@@ -66,13 +66,13 @@ var nouns = {
   'hooker': 5,
   'loins': 6,
   'mother': 3,
-  'pole': 4,
-  'shaft': 4,
+  'pole': 5,
+  'shaft': 5,
   'hole': 4,
-  'face': 3,
+  'face': 4,
   'popsicle': 3,
   'chicken': 2,
-  'dick': 4,
+  'dick': 5,
   'crack': 2,
   'red': 5,
   'club': 3,
@@ -94,6 +94,8 @@ var nouns = {
   'staff': 4,
   'flower': 3,
   'joystick': 5,
+  'stick': 5,
+  'wood': 4,
   'flute': 4,
   'skin': 4,
   'snake': 5,
@@ -146,7 +148,7 @@ var verbs = {
   'grind': 4,
 };
 
-var countPhrasingScore = function(msg){
+var totalPhrasingScore = function(msg){
   var words = msg.split(' ');
   var pointVal = 0;
   words.forEach(function (word) {
@@ -154,7 +156,6 @@ var countPhrasingScore = function(msg){
     pointVal += nouns[word] || 0;
     pointVal += verbs[word] || 0;
   });
-
   return pointVal;
 };
 
@@ -162,5 +163,5 @@ module.exports = {
   adjectives : adjectives,
   nouns: nouns,
   verbs: verbs,
-  phrasingScore: countPhrasingScore,
+  phrasingScore: totalPhrasingScore,
 };
