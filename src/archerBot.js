@@ -402,16 +402,19 @@ function pickRandom(list) {
 }
 
 function yellName(name) {
-  if(!name || name.length < 2){
+  if(!name){
     return;
   }
   var lastVowelIndex, vowelToExpand;
-  for(var i = name.length-1; i > 0; i--){
+  for(var i = name.length-1; i >= 0; i--){
     if(VOWEL_REGEXP.test(name.charAt(i))){
       lastVowelIndex = i;
       vowelToExpand = name.charAt(i);
       break;
     }
+  }
+  if(!vowelToExpand){
+    return;
   }
   var nameBegin = name.slice(0, lastVowelIndex);
   var nameEnd = name.slice(lastVowelIndex, name.length);

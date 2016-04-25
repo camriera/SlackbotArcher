@@ -72,7 +72,7 @@ var goodbye = [
 
 
 var welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
-  '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. Its not like I\'m your servant like Woodhouse';
+  '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. It\'s not like I\'m your servant like Woodhouse.';
 
 module.exports = {
   phrasing: phrasing,
