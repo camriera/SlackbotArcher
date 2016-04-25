@@ -50,7 +50,7 @@ ArcherBot.prototype._onStart = function () {
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
     console.log(message);
-    if (this._isNewlyJoinedChannel(message)) {
+    if (this._isMessageFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.dangerZone));
         removeJoinedUser(message);
@@ -103,8 +103,8 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
  * @returns {boolean}
  * @private
  */
-ArcherBot.prototype._isNewlyJoinedChannel = function (message) {
-  return !!joinedUsers[message.channel];
+ArcherBot.prototype._isMessageFromNewlyJoinedUser = function (message) {
+  return joinedUsers[message.channel] ? joinedUsers[message.channel].id === message.user : false;
 };
 
 /**
@@ -117,11 +117,12 @@ ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, re
   var user = self._getUserById(originalMessage.user);
   var name = user.profile.first_name || user.name;
   replyCount = replyCount || 0;
-  if(replyCount > 3 || !self._isNewlyJoinedChannel(originalMessage)){
+  if(replyCount > 3 || joinedUsers[originalMessage.channel].id !== user.id){
+    clearTimeout(timeout);
     return;
   }
   var increment = replyCount + 1;
-  setTimeout(function () {
+  var timeout = setTimeout(function () {
     self._postMessage(originalMessage, repeatName(name, replyCount), self._replyWithDangerZoneDiatribe(originalMessage, increment));
   }, 2000);
 };
