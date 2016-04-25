@@ -7,23 +7,16 @@ var responses = require('../data/responses')
 var Bot = require('slackbots');
 
 const PHRASING_TRIGGER_POINT_VAL = 10;
-var CANT_WONT_REGEXP = (/(i|we)\s(cant|can\'t)/ig);
+var CANT_WONT_REGEXP = (/(i|we)\s(cant|can’t)/ig);
 var JOIN_RESPONSE = (/wh*?a+t|yes|yeah?|shut.*up|wu+t|no/ig);
 var VOWEL_REGEXP = /a|e|i|o|u|y/ig;
 
-var newUser = {
-  id: '',
-  joined: false,
-  responded: false
-};
+var joinedUsers = {};
 
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
   this.settings.name = this.settings.name || 'archer';
-  //this.dbPath = settings.dbPath || path.resolve(process.cwd(), 'data', 'archerbot.db');
-
   this.user = null;
-  //this.db = null;
 };
 
 // inherits methods and properties from the Bot constructor
@@ -47,9 +40,6 @@ ArcherBot.prototype._onStart = function () {
   this._loadBotUser();
   console.log('archer bot: ' + this.user);
   this._welcomeMessage();
-
-  //this._connectDb();
-  //this._firstRunCheck();
 };
 
 /**
@@ -60,30 +50,29 @@ ArcherBot.prototype._onStart = function () {
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
     console.log(message);
-    if (this._isReplyFromJustJoinedUser(message)) {
+    if (this._isNewlyJoinedChannel(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.dangerZone));
-        newUser.joined = false;
-        newUser.responded = true;
-        newUser.id = '';
+        removeJoinedUser(message);
       }
+    }
+    else if (this._isTriggerPhrasingResponse(message)) {
+      this._postMessage(message, pickRandom(responses.phrasing));
+    } else if (this._isTriggerCantWont(message)) {
+      this._postMessage(message, 'Can\'t or won\'t?');
     }
     else if (this._isMentioningArcher(message)) {
       this._postMessage(message, pickRandom(responses.random));
     }
-    else if (this._isTriggerCantWont(message)) {
-      this._postMessage(message, responses.cantWont);
-    }
-    else if (this._isTriggerPhrasingResponse(message)) {
-      this._postMessage(message, pickRandom(responses.phrasing));
-    }
     //User joins channel or group
-    else if (this._isChannelJoin(message) || this._isGroupJoin(message)) {
-      console.log('user '+message.user+ ' joined channel/group' + message.channel);
-      newUser.joined = true;
-      newUser.id = message.user;
-      newUser.responded = false;
+    else if (this._isChannelOrGroupJoin(message)) {
+      console.log('user '+message.user+ ' joined channel/group ' + message.channel);
+      addJoinedUser(message);
+      console.log('joinedUsers: '+joinedUsers);
       this._replyWithDangerZoneDiatribe(message);
+    } else if (this._isChannelOrGroupLeave(message)){
+      console.log('user '+message.user+ ' left channel/group ' + message.channel);
+      this._postMessage(message, pickRandom(responses.goodbye));
     }
   }
 };
@@ -114,8 +103,8 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
  * @returns {boolean}
  * @private
  */
-ArcherBot.prototype._isReplyFromJustJoinedUser = function (message) {
-  return message.user === newUser.id;
+ArcherBot.prototype._isNewlyJoinedChannel = function (message) {
+  return !!joinedUsers[message.channel];
 };
 
 /**
@@ -128,7 +117,7 @@ ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, re
   var user = self._getUserById(originalMessage.user);
   var name = user.profile.first_name || user.name;
   replyCount = replyCount || 0;
-  if(replyCount > 3 || newUser.responded){
+  if(replyCount > 3 || !self._isNewlyJoinedChannel(originalMessage)){
     return;
   }
   var increment = replyCount + 1;
@@ -154,6 +143,8 @@ ArcherBot.prototype._loadBotUser = function () {
  * @private
  */
 ArcherBot.prototype._welcomeMessage = function () {
+
+
   if(this.channels.length){
     this._postMessage({type: 'message', channel: this.channels[0].name}, responses.welcome);
   }
@@ -240,6 +231,24 @@ ArcherBot.prototype._isChannelJoin = function (message) {
 };
 
 /**
+ * Util function to check if channel_leave event
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isChannelLeave = function (message){
+  var isLeaveBotChannel = false;
+  if(message.subtype === 'channel_leave') {
+    this.channels.forEach(function (channel) {
+      if(message.channel === channel.id){
+        isLeaveBotChannel = true;
+      }
+    });
+  }
+  return isLeaveBotChannel;
+};
+
+/**
  * Util function to check if a group_join
  * @param message
  * @returns {boolean}
@@ -255,6 +264,44 @@ ArcherBot.prototype._isGroupJoin = function (message) {
     });
   }
   return isJoinedBotGroup;
+};
+
+/**
+ * Util function to check if group_leave event
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isGroupLeave = function (message){
+  var isLeaveBotGroup = false;
+  if(message.subtype === 'group_leave') {
+    this.groups.forEach(function (group) {
+      if(message.channel === group.id){
+        isLeaveBotGroup = true;
+      }
+    });
+  }
+  return isLeaveBotGroup;
+};
+
+/**
+ * Util function to check if channel or group joins event
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isChannelOrGroupJoin = function (message) {
+  return this._isChannelJoin(message) || this._isGroupJoin(message);
+};
+
+/**
+ * Util function to check if channel or group leave event occurs
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isChannelOrGroupLeave = function (message) {
+  return this._isChannelLeave(message) || this._isGroupLeave(message);
 };
 
 /**
@@ -363,66 +410,22 @@ function yellName(name) {
   return name.toUpperCase();
 }
 
-//////////////////////////////// DB Implementation \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+function addJoinedUser(msg){
+  if(!joinedUsers[msg.user]) {
+    joinedUsers[msg.channel] = {
+      id: msg.user,
+      timeout: setTimeout(function () {
+        delete joinedUsers[msg.channel];
+      }, 15 * 60 * 1000)
+    }
+  }
+}
 
-/**
- * Replyes to a message with a random Joke
- * @param {object} originalMessage
- * @private
- */
-//ArcherBot.prototype._replyWithRandomResponse = function (originalMessage) {
-//  var self = this;
-//  self.db.get('SELECT id, joke FROM jokes ORDER BY used ASC, RANDOM() LIMIT 1', function (err, record) {
-//    if (err) {
-//      return console.error('DATABASE ERROR:', err);
-//    }
-//
-//    var channel = self._getChannelById(originalMessage.channel);
-//    self.postMessageToChannel(channel.name, record.joke, {as_user: true});
-//    self.db.run('UPDATE jokes SET used = used + 1 WHERE id = ?', record.id);
-//  });
-//};
-
-
-//var SQLite = require('sqlite3').verbose();
-//var path = require('path');
-
-/**
- * Open connection to the db
- * @private
- */
-//ArcherBot.prototype._connectDb = function () {
-//  if (!fs.existsSync(this.dbPath)) {
-//    console.error('Database path ' + '"' + this.dbPath + '" does not exists or it\'s not readable.');
-//    process.exit(1);
-//  }
-//
-//  this.db = new SQLite.Database(this.dbPath);
-//};
-
-/**
- * Check if the first time the bot is run. It's used to send a welcome message into the channel
- * @private
- */
-//ArcherBot.prototype._firstRunCheck = function () {
-//  var self = this;
-//  self.db.get('SELECT val FROM info WHERE name = "lastrun" LIMIT 1', function (err, record) {
-//    if (err) {
-//      return console.error('DATABASE ERROR:', err);
-//    }
-//
-//    var currentTime = (new Date()).toJSON();
-//
-//    // this is a first run
-//    if (!record) {
-//      self._welcomeMessage();
-//      return self.db.run('INSERT INTO info(name, val) VALUES("lastrun", ?)', currentTime);
-//    }
-//
-//    // updates with new last running time
-//    self.db.run('UPDATE info SET val = ? WHERE name = "lastrun"', currentTime);
-//  });
-//};
-
+function removeJoinedUser (msg){
+  if(joinedUsers[msg.channel]){
+    clearTimeout(joinedUsers[msg.channel].timeout);
+    delete joinedUsers[msg.channel];
+  }
+}
 
 module.exports = ArcherBot;

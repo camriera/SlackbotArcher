@@ -63,6 +63,14 @@ var derogatory = [
   'https://giphy.com/gifs/request-top-promo-c16UpkOrOenV6'
 ];
 
+var goodbye = [
+  'https://m.popkey.co/cb43a2/OXWKY.gif',
+  'GOOD RIDDANCE!',
+  'At least he died doing what he loved... Getting shot.',
+  'Thank God for small miracles!',
+];
+
+
 var welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
   '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. Its not like I\'m your servant like Woodhouse';
 
@@ -72,5 +80,6 @@ module.exports = {
   cantWont: cantWont,
   random: random,
   derogatory: derogatory,
-  welcome: welcomeMsg
+  welcome: welcomeMsg,
+  goodbye: goodbye,
 };

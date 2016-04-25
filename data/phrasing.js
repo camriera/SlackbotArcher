@@ -5,7 +5,7 @@
 'use strict';
 
 var adjectives = {
-  'hard': 5,
+  'hard': 7,
   'soft': 3,
   'rigid': 3,
   'creamy': 5,
@@ -45,7 +45,9 @@ var adjectives = {
   'thin': 2,
   'purple': 2,
   'blonde': 5,
-  'asian': 4
+  'asian': 4,
+  'vigorously': 5,
+  'hardening': 5
 };
 
 var nouns = {
@@ -72,6 +74,7 @@ var nouns = {
   'face': 4,
   'popsicle': 3,
   'chicken': 2,
+  'sausage': 6,
   'dick': 5,
   'crack': 2,
   'red': 5,
@@ -91,11 +94,12 @@ var nouns = {
   'tip': 3,
   'organ': 3,
   'rod': 4,
+  'worm': 5,
   'staff': 4,
   'flower': 3,
   'joystick': 5,
   'stick': 5,
-  'wood': 4,
+  'wood': 5,
   'flute': 4,
   'skin': 4,
   'snake': 5,
@@ -110,6 +114,9 @@ var verbs = {
   'sploosh': 6,
   'spluge': 6,
   'fuck': 3,
+  'beat': 6,
+  'fist': 7,
+  'milk': 6,
   'bite': 4,
   'eat': 3,
   'ate': 2,
