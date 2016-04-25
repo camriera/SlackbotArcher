@@ -143,13 +143,22 @@ ArcherBot.prototype._loadBotUser = function () {
  * @private
  */
 ArcherBot.prototype._welcomeMessage = function () {
-
-
-  if(this.channels.length){
-    this._postMessage({type: 'message', channel: this.channels[0].name}, responses.welcome);
+  var self = this;
+  if(this.channels) {
+    this.channels.forEach(function (channel) {
+      if (channel.is_member) {
+        console.log('posting message to channel '+ channel.name);
+        self._postMessage({type: 'message', channel: channel.id}, responses.welcome);
+      }
+    });
   }
-  if(this.groups.length){
-    this._postMessage({type: 'message', channel: this.groups[0].name}, responses.welcome);
+  if(this.groups){
+    this.groups.forEach(function (group) {
+      if(group.is_member){
+        console.log('posting message to group'+ group.name);
+        self._postMessage({type: 'message', channel: group.id}, responses.welcome);
+      }
+    });
   }
 };
 
