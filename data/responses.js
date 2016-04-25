@@ -16,7 +16,7 @@ var phrasing = [
   'https://giphy.com/gifs/archer-sterling-VaWZIxqTkzKsU\nAh, PHRASING!'
 ];
 
-var dangerZone = [
+var joinEvt = [
   'https://giphy.com/gifs/archer-fx-sterling-cbAb0vWhJqA2k',
   'https://giphy.com/gifs/archer-skytanic-danger-zone-H8iL56bXGjVE4',
   'https://giphy.com/gifs/archer-space-race-danger-zone-xGbA1gRCAj1jW',
@@ -24,11 +24,20 @@ var dangerZone = [
   'https://giphy.com/gifs/archer-sterling-danger-zone-1KjHBUoGbeN9e',
   'http://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-11.gif',
   'https://giphy.com/gifs/archer-bryan-cranston-IDPJpueOB5VE4',
-  'DANGER ZONE!\nhttps://giphy.com/gifs/archer-top-gun-iByd2dFdFwKn6',
+  'Paging Kenny Loggins because you\'re in the *DANGER ZONE!*',
   'https://giphy.com/gifs/archer-reactiongifs-mrw-Kz420G0aGw5mU',
   'Danger zone. Duh!\nHaven\'t you ever seen Top Gun? Or like heard of legendary rock singer, songwriter, guitarist Kenny Freakin\' Loggins!?',
   'DANGER ZONE!'
 ];
+
+var dangerZone = [
+  'http://giphy.com/gifs/archer-danger-zone-uyAwhtcreKlS8',
+  'http://giphy.com/gifs/archer-sterling-danger-zone-FZvDN82t81A0o',
+  'http://giphy.com/gifs/archer-sterling-danger-zone-FzZmhc3JDGo9O',
+  'http://giphy.com/gifs/archer-top-gun-fx-De5Lfx0LI1SjS',
+  'http://giphy.com/gifs/archer-top-gun-fx-10K5qB48ijXneE',
+  'https://giphy.com/gifs/archer-top-gun-iByd2dFdFwKn6'
+]
 
 var cantWont = ['Can\'t or won\'t?'];
 
@@ -63,7 +72,7 @@ var derogatory = [
   'https://giphy.com/gifs/request-top-promo-c16UpkOrOenV6'
 ];
 
-var goodbye = [
+var leaveEvt = [
   'https://m.popkey.co/cb43a2/OXWKY.gif',
   'GOOD RIDDANCE!',
   'At least he died doing what he loved... Getting shot.',
@@ -76,10 +85,11 @@ var welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
 
 module.exports = {
   phrasing: phrasing,
+  joinEvt: joinEvt,
   dangerZone: dangerZone,
   cantWont: cantWont,
   random: random,
   derogatory: derogatory,
   welcome: welcomeMsg,
-  goodbye: goodbye,
+  leaveEvt: leaveEvt
 };

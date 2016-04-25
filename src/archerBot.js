@@ -9,7 +9,10 @@ var Bot = require('slackbots');
 const PHRASING_TRIGGER_POINT_VAL = 10;
 var CANT_WONT_REGEXP = (/(i|we)\s(cant|can’t)/ig);
 var JOIN_RESPONSE = (/wh*?a+t|yes|yeah?|shut.*up|wu+t|no/ig);
-var VOWEL_REGEXP = /a|e|i|o|u|y/ig;
+var VOWEL_REGEXP = (/a|e|i|o|u|y/ig);
+var DANGER_ZONE_REGEXP =
+  /((danger|peril|trouble|unsafe|deadly|precarious|risky)+.*(zone|area|place|location|spot|realm|territory|section)+|(zone|area|place|location|spot|realm|territory|section)+.*(danger|peril|trouble|unsafe|deadly|precarious|risky)+)/ig;
+
 
 var joinedUsers = {};
 
@@ -52,13 +55,17 @@ ArcherBot.prototype._onMessage = function (message) {
     console.log(message);
     if (this._isMessageFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
-        this._postMessage(message, pickRandom(responses.dangerZone));
+        this._postMessage(message, pickRandom(responses.joinEvt));
         removeJoinedUser(message);
       }
     }
     else if (this._isTriggerPhrasingResponse(message)) {
       this._postMessage(message, pickRandom(responses.phrasing));
-    } else if (this._isTriggerCantWont(message)) {
+    }
+    else if(this._isTriggerDangerZoneResponse(message)) {
+      this._postMessage(message, pickRandom(responses.dangerZone));
+    }
+    else if (this._isTriggerCantWont(message)) {
       this._postMessage(message, 'Can\'t or won\'t?');
     }
     else if (this._isMentioningArcher(message)) {
@@ -72,7 +79,7 @@ ArcherBot.prototype._onMessage = function (message) {
       this._replyWithDangerZoneDiatribe(message);
     } else if (this._isChannelOrGroupLeave(message)){
       console.log('user '+message.user+ ' left channel/group ' + message.channel);
-      this._postMessage(message, pickRandom(responses.goodbye));
+      this._postMessage(message, pickRandom(responses.leaveEvt));
     }
   }
 };
@@ -85,6 +92,16 @@ ArcherBot.prototype._onMessage = function (message) {
  */
 ArcherBot.prototype._isTriggerPhrasingResponse = function (message) {
   return phrasing.phrasingScore(message.text) >= PHRASING_TRIGGER_POINT_VAL;
+};
+
+/**
+ * Checks whether the mssage contains values for a danger zone response
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isTriggerDangerZoneResponse = function (message) {
+  return DANGER_ZONE_REGEXP.test(message.text);
 };
 
 /**
