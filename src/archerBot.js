@@ -3,7 +3,7 @@
 var util = require('util');
 var fs = require('fs');
 var phrasing = require('../data/phrasing');
-var responses = require('../data/responses')
+var responses = require('../data/responses');
 var Bot = require('slackbots');
 
 const PHRASING_TRIGGER_POINT_VAL = 10;
@@ -53,7 +53,17 @@ ArcherBot.prototype._onStart = function () {
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
     console.log(message);
-    if (this._isMessageFromNewlyJoinedUser(message)) {
+    if (this._isChannelOrGroupJoin(message)) {
+      addJoinedUser(message);
+      this._replyWithDangerZoneDiatribe(message);
+    }
+    else if (this._isChannelOrGroupLeave(message)){
+      if(joinedUsers[message.channel].id === message.user){
+        removeJoinedUser(message);
+      }
+      this._postMessage(message, pickRandom(responses.leaveEvt));
+    }
+    else if (this._isMessageFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.joinEvt));
         removeJoinedUser(message);
@@ -70,16 +80,6 @@ ArcherBot.prototype._onMessage = function (message) {
     }
     else if (this._isMentioningArcher(message)) {
       this._postMessage(message, pickRandom(responses.random));
-    }
-    //User joins channel or group
-    else if (this._isChannelOrGroupJoin(message)) {
-      console.log('user '+message.user+ ' joined channel/group ' + message.channel);
-      addJoinedUser(message);
-      console.log('joinedUsers: '+joinedUsers);
-      this._replyWithDangerZoneDiatribe(message);
-    } else if (this._isChannelOrGroupLeave(message)){
-      console.log('user '+message.user+ ' left channel/group ' + message.channel);
-      this._postMessage(message, pickRandom(responses.leaveEvt));
     }
   }
 };
@@ -124,6 +124,8 @@ ArcherBot.prototype._isMessageFromNewlyJoinedUser = function (message) {
   return joinedUsers[message.channel] ? joinedUsers[message.channel].id === message.user : false;
 };
 
+
+
 /**
  * Replies with the danger zone Lana like diatribe using the users name who just joined the channel/group
  * @param originalMessage
@@ -134,15 +136,22 @@ ArcherBot.prototype._replyWithDangerZoneDiatribe = function (originalMessage, re
   var user = self._getUserById(originalMessage.user);
   var name = user.profile.first_name || user.name;
   replyCount = replyCount || 0;
-  if(replyCount > 3 || joinedUsers[originalMessage.channel].id !== user.id){
-    clearTimeout(timeout);
+
+  if(replyCount > 3 || !joinedUsers[originalMessage.channel]){
+    if(self._replyWithDangerZoneDiatribe.timeout[user.id]) {
+      clearTimeout(self._replyWithDangerZoneDiatribe.timeout[user.id]);
+    }
     return;
   }
+
   var increment = replyCount + 1;
-  var timeout = setTimeout(function () {
+  self._replyWithDangerZoneDiatribe.timeout[user.id] = setTimeout(function () {
     self._postMessage(originalMessage, repeatName(name, replyCount), self._replyWithDangerZoneDiatribe(originalMessage, increment));
   }, 2000);
 };
+
+//cache timeouts
+ArcherBot.prototype._replyWithDangerZoneDiatribe.timeout = {};
 
 /**
  * Loads the user object representing the bot
@@ -217,7 +226,7 @@ ArcherBot.prototype._isGroupConversation = function (message) {
  * @returns {boolean}
  */
 ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
-  return typeof message.channel === 'string' && this._isChannelConversation(message) ||
+  return this._isChannelConversation(message) ||
       this._isGroupConversation(message);
 };
 
@@ -227,16 +236,9 @@ ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
  * @param response
  * @private
  */
-ArcherBot.prototype._postMessage = function (originalMessage, response, callback) {
+ArcherBot.prototype._postMessage = function (originalMessage, response) {
   //console.log('posting message to ' +originalMessage.channel + ' - ' + response);
-  if(this._isChannelConversation(originalMessage)){
-    var channel = this._getChannelById(originalMessage.channel);
-    this.postMessageToChannel(channel.name, response, {as_user: true});
-  }
-  if(this._isGroupConversation(originalMessage)){
-    var group = this._getGroupById(originalMessage.channel);
-    this.postMessageToGroup(group.name, response, {as_user: true}, callback);
-  }
+  this.postMessage(originalMessage.channel, response, {as_user:true});
 };
 
 /**
@@ -246,15 +248,7 @@ ArcherBot.prototype._postMessage = function (originalMessage, response, callback
  * @private
  */
 ArcherBot.prototype._isChannelJoin = function (message) {
-  var isJoinedBotChannel = false;
-  if(message.subtype === 'channel_join') {
-    this.channels.forEach(function (channel) {
-      if (message.channel === channel.id){
-        isJoinedBotChannel = true;
-      }
-    });
-  }
-  return isJoinedBotChannel;
+  return message.subtype === 'channel_join';
 };
 
 /**
@@ -264,15 +258,7 @@ ArcherBot.prototype._isChannelJoin = function (message) {
  * @private
  */
 ArcherBot.prototype._isChannelLeave = function (message){
-  var isLeaveBotChannel = false;
-  if(message.subtype === 'channel_leave') {
-    this.channels.forEach(function (channel) {
-      if(message.channel === channel.id){
-        isLeaveBotChannel = true;
-      }
-    });
-  }
-  return isLeaveBotChannel;
+  return message.subtype === 'channel_leave';
 };
 
 /**
@@ -282,15 +268,7 @@ ArcherBot.prototype._isChannelLeave = function (message){
  * @private
  */
 ArcherBot.prototype._isGroupJoin = function (message) {
-  var isJoinedBotGroup = false;
-  if(message.subtype === 'group_join') {
-    this.groups.forEach(function (group) {
-      if(group.id === message.channel){
-        isJoinedBotGroup = true;
-      }
-    });
-  }
-  return isJoinedBotGroup;
+  return message.subtype === 'group_join';
 };
 
 /**
@@ -300,15 +278,7 @@ ArcherBot.prototype._isGroupJoin = function (message) {
  * @private
  */
 ArcherBot.prototype._isGroupLeave = function (message){
-  var isLeaveBotGroup = false;
-  if(message.subtype === 'group_leave') {
-    this.groups.forEach(function (group) {
-      if(message.channel === group.id){
-        isLeaveBotGroup = true;
-      }
-    });
-  }
-  return isLeaveBotGroup;
+  return message.subtype === 'group_leave';
 };
 
 /**
@@ -353,31 +323,6 @@ ArcherBot.prototype._isMentioningArcher = function (message) {
 ArcherBot.prototype._isFromArcherBot = function (message) {
   return message.user === this.user.id;
 };
-
-/**
- * Util function to get the name of a channel given its id
- * @param {string} channelId
- * @returns {Object}
- * @private
- */
-ArcherBot.prototype._getChannelById = function (channelId) {
-  return this.channels.filter(function (item) {
-    return item.id === channelId;
-  })[0];
-};
-
-/**
- * Util function to get the group by its id
- * @param groupId
- * @returns {T|*}
- * @private
- */
-ArcherBot.prototype._getGroupById = function (groupId) {
-  return this.groups.filter(function (item) {
-    return item.id === groupId;
-  })[0];
-};
-
 
 /**
  * Util function to get the user by its id
@@ -453,7 +398,11 @@ function addJoinedUser(msg){
 
 function removeJoinedUser (msg){
   if(joinedUsers[msg.channel]){
+    console.log('clearing timeout for user '+ msg.user);
     clearTimeout(joinedUsers[msg.channel].timeout);
+    if(ArcherBot.prototype._replyWithDangerZoneDiatribe.timeout[msg.user]){
+      clearTimeout(ArcherBot.prototype._replyWithDangerZoneDiatribe.timeout[msg.user]);
+    }
     delete joinedUsers[msg.channel];
   }
 }
