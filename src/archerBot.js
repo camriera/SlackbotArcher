@@ -58,12 +58,12 @@ ArcherBot.prototype._onMessage = function (message) {
       this._replyWithDangerZoneDiatribe(message);
     }
     else if (this._isChannelOrGroupLeave(message)){
-      if(joinedUsers[message.channel].id === message.user){
+      if(this._isFromNewlyJoinedUser(message)){
         removeJoinedUser(message);
       }
       this._postMessage(message, pickRandom(responses.leaveEvt));
     }
-    else if (this._isMessageFromNewlyJoinedUser(message)) {
+    else if (this._isFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
         this._postMessage(message, pickRandom(responses.joinEvt));
         removeJoinedUser(message);
@@ -120,11 +120,17 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
  * @returns {boolean}
  * @private
  */
-ArcherBot.prototype._isMessageFromNewlyJoinedUser = function (message) {
+ArcherBot.prototype._isFromNewlyJoinedUser = function (message) {
   return joinedUsers[message.channel] ? joinedUsers[message.channel].id === message.user : false;
 };
 
 
+//ArcherBot.prototype._isUserActive = function (message) {
+//  this._api('user.getPresence', message.user).then(function (status) {
+//    console.log('user presence for userId: '+ message.user + ' is '+status.presence);
+//    return status.presence === 'active' || false;
+//  });
+//};
 
 /**
  * Replies with the danger zone Lana like diatribe using the users name who just joined the channel/group
