@@ -24,12 +24,12 @@ You will find your API key under the field API Token, copy it in a safe place an
 
 ## Configuration
 
-The NorrisBot is configurable through environment variables. There are several variable available:
+The SlackbotArcher is configurable through environment variables. There are several variable available:
 
 | Environment variable | Description |
 |----------------------|-------------|
 | `BOT_API_KEY` | this variable is mandatory and must be used to specify the API token needed by the bot to connect to your Slack organization |
-| `BOT_NAME` | the name of your bot, it’s optional and it will default to norrisbot |
+| `BOT_NAME` | the name of your bot, it’s optional and it will default to archer |
 
 ## Launching the bot from source
 
