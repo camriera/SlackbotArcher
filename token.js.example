@@ -1,0 +1,3 @@
+'use strict';
+
+module.exports = 'xoxb-your-private-api-token-here';
