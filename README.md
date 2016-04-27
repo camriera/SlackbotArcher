@@ -1,6 +1,6 @@
 # SlackbotArcher
 
-![Archer Profile Pic](archer-head.png)
+![Archer Profile Pic](archer_head.png)
 
 The Slackbot Archer comes equipped with his famous DANGER ZONE diatribe when someone joins a channel or group.
 He also does phrasing, and "Can't or Won't?". Mention his name and see what he does!
