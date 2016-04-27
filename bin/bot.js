@@ -28,6 +28,9 @@ var archerbot = new ArcherBot({
 
 archerbot.run();
 
+
+
+/******************  HACK TO GET HEROKU TO STOP CRASHING ON PORT BINDING ISSUE *********************/
 var express = require('express');
 var app = express();
 

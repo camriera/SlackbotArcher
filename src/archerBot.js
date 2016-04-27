@@ -42,7 +42,7 @@ ArcherBot.prototype.run = function () {
 ArcherBot.prototype._onStart = function () {
   this._loadBotUser();
   console.log('archer bot: ' + this.user);
-  this._welcomeMessage();
+  //this._welcomeMessage();
 };
 
 /**
