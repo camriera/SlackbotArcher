@@ -1,0 +1,12 @@
+{
+  "name": "Archerbot",
+  "description": "Archerbot is a Slackbot based of FX's Sterling Archer of the TV series Archer™",
+  "repository": "https://github.com/camriera/SlackbotArcher",
+  "env": {
+    "BOT_API_KEY": {
+      "description": "Slack bot RTM API token",
+      "required": true
+    }
+  },
+  "image": "heroku/nodejs"
+}

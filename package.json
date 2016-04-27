@@ -11,8 +11,7 @@
     "url": "https://github.com/camriera/SlackbotArcher"
   },
   "dependencies": {
-    "slackbots": "^0.5.1",
-    "express": "^3.3.12"
+    "slackbots": "^0.5.1"
   },
   "devDependencies": {},
   "scripts": {
