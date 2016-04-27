@@ -7,13 +7,25 @@ He also does phrasing, and "Can't or Won't?". Mention his name and see what he d
 
 ![SlackbotArcher in action](slackbot-archer-in-action.png)
 
+## Installation
+Be sure to have npm and node (`>= 0.10` version, or io.js `>= 1.0`) installed and launch:
+
+```bash
+$ npm install -g https://github.com/camriera/SlackbotArcher.git
+```
+Verify that the package installs properly. From your package root directory, enter the following to install your package globally.
+
+```bash
+$ npm install . -g
+```
+
 ## Running the SlackbotArcher
 
 To run SlackbotArcher you must have an [API token(#getting-the-api-token-for-your-slack-channel) to authenticate the bot on your slack channel.
 Once you get it (instructions on the next paragraph) you just have to run:
 
 ```bash
-BOT_API_KEY=secretapikey archerbot
+BOT_API_KEY=secretapikey npm start
 ```
 
 ## Getting the API token for your Slack channel
