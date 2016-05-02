@@ -51,7 +51,7 @@ ArcherBot.prototype._onStart = function () {
  * @private
  */
 ArcherBot.prototype._onMessage = function (message) {
-  if (this._isChatMessage(message) && this._isChannelOrGroupConversation(message) && !this._isFromArcherBot(message)) {
+  if (this._isChatMessage(message) && this._isChannelGroupOrDMConversation(message) && !this._isFromArcherBot(message)) {
     console.log(message);
     if (this._isChannelOrGroupJoin(message)) {
       addJoinedUser(message);
@@ -227,13 +227,24 @@ ArcherBot.prototype._isGroupConversation = function (message) {
 };
 
 /**
- * Util function to check if a given real time message object is directed to a group
+ * Util function to check if a given real time message is a Direct Message to a user
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isDMConversation = function (message) {
+  return typeof message.channel === 'string' && message.channel[0] === 'D';
+};
+
+/**
+ * Util function to check if a given real time message object is directed to a Channel, Group, DM
  * @param message
  * @returns {boolean}
  */
-ArcherBot.prototype._isChannelOrGroupConversation = function (message) {
+ArcherBot.prototype._isChannelGroupOrDMConversation = function (message) {
   return this._isChannelConversation(message) ||
-      this._isGroupConversation(message);
+      this._isGroupConversation(message) ||
+      this._isDMConversation(message);
 };
 
 /**
