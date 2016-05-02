@@ -62,6 +62,7 @@ var nouns = {
   'boobs': 4,
   'seed': 5,
   'blood': 3,
+  'rock': 3,
   'booty': 4,
   'bum': 4,
   'banana': 5,

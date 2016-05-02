@@ -37,7 +37,7 @@ var dangerZone = [
   'http://giphy.com/gifs/archer-top-gun-fx-De5Lfx0LI1SjS',
   'http://giphy.com/gifs/archer-top-gun-fx-10K5qB48ijXneE',
   'https://giphy.com/gifs/archer-top-gun-iByd2dFdFwKn6'
-]
+];
 
 var cantWont = ['Can\'t or won\'t?'];
 
@@ -77,6 +77,7 @@ var leaveEvt = [
   'GOOD RIDDANCE!',
   'At least he died doing what he loved... Getting shot.',
   'Thank God for small miracles!',
+  'HOORAY!'
 ];
 
 
