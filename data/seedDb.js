@@ -3,10 +3,10 @@
  */
 var sqlite3 = require('sqlite3').verbose();
 var phrasing = require('phrasing');
-var db = new sqlite3.Database(':memory:');
+var db = new sqlite3.Database('archerDb.db');
 
 db.serialize(function() {
-  db.run("CREATE TABLE phrasing (" +
+  db.run("CREATE TABLE response (" +
       "WORD TEXT NOT NULL, " +
       "POINT_VAL INT NOT NULL" +
     ")");
