@@ -4,6 +4,7 @@ var util = require('util');
 var fs = require('fs');
 var phrasing = require('../data/phrasing');
 var responses = require('../data/responses');
+var SQLite = require('sqlite3').verbose();
 var Bot = require('slackbots');
 
 const PHRASING_TRIGGER_POINT_VAL = 10;
@@ -16,10 +17,21 @@ var DANGER_ZONE_REGEXP =
 
 var joinedUsers = {};
 
+/**
+ * Constructor function. It takes settings object with the following keys:
+ *    token : the private API token to log the bot into slack (required)
+ *    name  : the name of the bot (default 'archer')
+ *    dbPath: the path to access the database seeded from responses (default 'data/archerbot.db')
+ * @param settings
+ * @constructor
+ */
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
   this.settings.name = this.settings.name || 'archer';
+  this.dbPath = settings.dbPath || '../data/archerbot.db';
+
   this.user = null;
+  this.db = null;
 };
 
 // inherits methods and properties from the Bot constructor
@@ -42,6 +54,7 @@ ArcherBot.prototype.run = function () {
 ArcherBot.prototype._onStart = function () {
   this._loadBotUser();
   console.log('archer bot: ' + this.user);
+  this._connectDb();
   //this._welcomeMessage();
 };
 
@@ -169,6 +182,18 @@ ArcherBot.prototype._loadBotUser = function () {
     return user.name === self.name;
   })[0];
   console.log('Bot details: '+this.user);
+};
+
+/**
+* Open connection to the db
+* @private
+*/
+ArcherBot.prototype._connectDb = function () {
+  if (!fs.existsSync(this.dbPath)) {
+    console.error('Database path ' + '"' + this.dbPath + '" does not exists or it\'s not readable.');
+    process.exit(1);
+  }
+  this.db = new SQLite.Database(this.dbPath);
 };
 
 /**

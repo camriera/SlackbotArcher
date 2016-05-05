@@ -17,12 +17,12 @@ var ArcherBot = require('../src/archerBot');
  *  BOT_NAME: the username you want to give to the bot within your organisation.
  */
 var token = process.env.BOT_API_KEY || require('../token');
-//var dbPath = process.env.BOT_DB_PATH;
+var dbPath = process.env.BOT_DB_PATH;
 var name = process.env.BOT_NAME || 'archer';
 
 var archerbot = new ArcherBot({
   token: token,
-  //dbPath: dbPath,
+  dbPath: dbPath,
   name: name
 });
 

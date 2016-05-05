@@ -84,7 +84,38 @@ var leaveEvt = [
 var welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
   '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. It\'s not like I\'m your servant like Woodhouse.';
 
+function all(){
+  var allResponses = [];
+
+  phrasing.forEach(function (phraseResp) {
+    allResponses.push({type: 'PHRASING', text: phraseResp});
+  });
+
+  joinEvt.forEach(function (joinResp) {
+    allResponses.push({type: 'JOIN', text: joinResp});
+  });
+
+  leaveEvt.forEach(function (leaveResp) {
+    allResponses.push({type: 'LEAVE', text: leaveResp});
+  });
+
+  dangerZone.forEach(function (dangerZoneResp) {
+    allResponses.push({type: 'DANGER_ZONE', text: dangerZoneResp});
+  });
+
+  random.forEach(function (randomResp){
+    allResponses.push({type: 'RANDOM', text: randomResp});
+  });
+
+  derogatory.forEach(function (derogatoryResp) {
+    allResponses.push({type: 'DEROGATORY', text: derogatoryResp});
+  });
+
+  return allResponses;
+}
+
 module.exports = {
+  all: all(),
   phrasing: phrasing,
   joinEvt: joinEvt,
   dangerZone: dangerZone,
