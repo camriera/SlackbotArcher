@@ -28,7 +28,7 @@ var joinedUsers = {};
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
   this.settings.name = this.settings.name || 'archer';
-  this.dbPath = settings.dbPath || '../data/archerbot.db';
+  this.dbPath = settings.dbPath || path.resolve(__dirname, '..', 'data', 'archerbot.db');
 
   this.user = null;
   this.db = null;
@@ -92,7 +92,7 @@ ArcherBot.prototype._onMessage = function (message) {
       this._postMessage(message, 'Can\'t or won\'t?');
     }
     else if (this._isMentioningArcher(message)) {
-      this._postMessage(message, pickRandom(responses.random));
+      this._replyWithRandomResponse(message);
     }
   }
 };
@@ -144,6 +144,22 @@ ArcherBot.prototype._isFromNewlyJoinedUser = function (message) {
 //    return status.presence === 'active' || false;
 //  });
 //};
+/**
+ * Replys to a message with a random Joke
+ * @param {object} originalMessage
+ * @private
+ */
+ArcherBot.prototype._replyWithRandomResponse = function (originalMessage) {
+  var self = this;
+  self.db.get('SELECT id, text FROM response WHERE type=RANDOM, ORDER BY last_used ASC, RANDOM() LIMIT 1', function (err, record) {
+    if (err) {
+      return console.error('DATABASE ERROR:', err);
+    }
+    self._postMessage(originalMessage, record.text);
+    self.db.run('UPDATE jokes SET last_used = ? WHERE id = ?', [Date.valueOf(), record.id]);
+  });
+};
+
 
 /**
  * Replies with the danger zone Lana like diatribe using the users name who just joined the channel/group
@@ -189,6 +205,7 @@ ArcherBot.prototype._loadBotUser = function () {
 * @private
 */
 ArcherBot.prototype._connectDb = function () {
+  console.log('dbPath is' + this.dbPath);
   if (!fs.existsSync(this.dbPath)) {
     console.error('Database path ' + '"' + this.dbPath + '" does not exists or it\'s not readable.');
     process.exit(1);
