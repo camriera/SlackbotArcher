@@ -52,6 +52,10 @@ var random = [
   'Do you want ants? Because that\'s how you get ants.',
   'WOOOOO!!!!!',
   'READ A BOOK!',
+  'IT REMEMBERS ME!',
+  'IT DOES KNOW MY NAME!',
+  'Name-dropper',
+  'Don\'t say, \"high function alcoholism\'"',
   'https://giphy.com/gifs/boys-name-FmhjPpYI83S7e',
   'https://giphy.com/gifs/archer-Td89ybyxkPK7e',
   'https://giphy.com/gifs/archer-DOuLOWb2jtBf2',
@@ -77,6 +81,7 @@ var leaveEvt = [
   'GOOD RIDDANCE!',
   'At least he died doing what he loved... Getting shot.',
   'Thank God for small miracles!',
+  'Okay... Love our little talks!',
   'HOORAY!'
 ];
 
