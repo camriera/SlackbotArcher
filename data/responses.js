@@ -55,7 +55,7 @@ var random = [
   'IT REMEMBERS ME!',
   'IT DOES KNOW MY NAME!',
   'Name-dropper',
-  'Don\'t say, \"high function alcoholism\'"',
+  'Don\'t say, \"high function alcoholism\"',
   'https://giphy.com/gifs/boys-name-FmhjPpYI83S7e',
   'https://giphy.com/gifs/archer-Td89ybyxkPK7e',
   'https://giphy.com/gifs/archer-DOuLOWb2jtBf2',

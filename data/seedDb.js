@@ -18,16 +18,16 @@ db.serialize(function () {
   console.log('Creating table `responses`...');
   db.run("CREATE TABLE IF NOT EXISTS responses (" +
     "id INTEGER PRIMARY KEY, " +
-    "type VARCHAR(16) NOT NULL, " +
+    "type TEXT NOT NULL, " +
     "text TEXT NOT NULL, " +
-    "last_used INT NOT NULL" +
+    "last_used INTEGER NOT NULL" +
     ")");
   console.log('Creating table `responses`, SUCCESSFUL');
 
   console.log('Seeding responses table...');
-  var stmt = db.prepare("INSERT INTO responses(type, text, last_used) VALUES (?, ?, ?)");
+  var stmt = db.prepare("INSERT INTO responses(id, type, text, last_used) VALUES (?, ?, ?, ?)");
   responses.all.forEach(function (response) {
-    stmt.run(response.type, response.text, 0);
+    stmt.run(null, response.type, response.text, 0);
   });
   stmt.finalize();
   console.log('Seeding `responses` SUCCESSFUL!');

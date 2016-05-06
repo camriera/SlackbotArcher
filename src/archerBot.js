@@ -28,7 +28,7 @@ var joinedUsers = {};
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
   this.settings.name = this.settings.name || 'archer';
-  this.dbPath = settings.dbPath || path.resolve(__dirname, '..', 'data', 'archerbot.db');
+  this.dbPath = settings.dbPath;
 
   this.user = null;
   this.db = null;
@@ -74,25 +74,25 @@ ArcherBot.prototype._onMessage = function (message) {
       if(this._isFromNewlyJoinedUser(message)){
         removeJoinedUser(message);
       }
-      this._postMessage(message, pickRandom(responses.leaveEvt));
+      this._replyWithResponse('LEAVE', message);
     }
     else if (this._isFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
-        this._postMessage(message, pickRandom(responses.joinEvt));
+        this._replyWithResponse('JOIN', message);
         removeJoinedUser(message);
       }
     }
     else if (this._isTriggerPhrasingResponse(message)) {
-      this._postMessage(message, pickRandom(responses.phrasing));
+      this._replyWithResponse('PHRASING', message);
     }
     else if(this._isTriggerDangerZoneResponse(message)) {
-      this._postMessage(message, pickRandom(responses.dangerZone));
+      this._replyWithResponse('DANGER_ZONE', message);
     }
     else if (this._isTriggerCantWont(message)) {
       this._postMessage(message, 'Can\'t or won\'t?');
     }
     else if (this._isMentioningArcher(message)) {
-      this._replyWithRandomResponse(message);
+      this._replyWithResponse('RANDOM', message);
     }
   }
 };
@@ -137,13 +137,6 @@ ArcherBot.prototype._isFromNewlyJoinedUser = function (message) {
   return joinedUsers[message.channel] ? joinedUsers[message.channel].id === message.user : false;
 };
 
-
-//ArcherBot.prototype._isUserActive = function (message) {
-//  this._api('user.getPresence', message.user).then(function (status) {
-//    console.log('user presence for userId: '+ message.user + ' is '+status.presence);
-//    return status.presence === 'active' || false;
-//  });
-//};
 /**
  * Replys to a message with a random Joke
  * @param {object} originalMessage
@@ -151,15 +144,25 @@ ArcherBot.prototype._isFromNewlyJoinedUser = function (message) {
  */
 ArcherBot.prototype._replyWithRandomResponse = function (originalMessage) {
   var self = this;
-  self.db.get('SELECT id, text FROM response WHERE type=RANDOM, ORDER BY last_used ASC, RANDOM() LIMIT 1', function (err, record) {
+  self.db.get('SELECT id, text FROM responses WHERE type=\"RANDOM\" ORDER BY last_used ASC, RANDOM() LIMIT 1', function (err, record) {
     if (err) {
       return console.error('DATABASE ERROR:', err);
     }
     self._postMessage(originalMessage, record.text);
-    self.db.run('UPDATE jokes SET last_used = ? WHERE id = ?', [Date.valueOf(), record.id]);
+    self.db.run('UPDATE responses SET last_used = ? WHERE id = ?', [new Date().valueOf(), record.id]);
   });
 };
 
+ArcherBot.prototype._replyWithResponse = function (type, originalMessage) {
+  var self = this;
+  self.db.get('SELECT id, text FROM responses WHERE type=? ORDER BY last_used ASC, RANDOM() LIMIT 1', type.toUpperCase(), function (err, record) {
+    if (err) {
+      return console.error('DATABASE ERROR:', err);
+    }
+    self._postMessage(originalMessage, record.text);
+    self.db.run('UPDATE responses SET last_used = ? WHERE id = ?', [new Date().valueOf(), record.id]);
+  });
+};
 
 /**
  * Replies with the danger zone Lana like diatribe using the users name who just joined the channel/group
@@ -205,7 +208,7 @@ ArcherBot.prototype._loadBotUser = function () {
 * @private
 */
 ArcherBot.prototype._connectDb = function () {
-  console.log('dbPath is' + this.dbPath);
+  console.log('dbPath is ' + this.dbPath);
   if (!fs.existsSync(this.dbPath)) {
     console.error('Database path ' + '"' + this.dbPath + '" does not exists or it\'s not readable.');
     process.exit(1);
@@ -296,7 +299,6 @@ ArcherBot.prototype._isChannelGroupOrDMConversation = function (message) {
  * @private
  */
 ArcherBot.prototype._postMessage = function (originalMessage, response) {
-  //console.log('posting message to ' +originalMessage.channel + ' - ' + response);
   this.postMessage(originalMessage.channel, response, {as_user:true});
 };
 
@@ -464,6 +466,17 @@ function removeJoinedUser (msg){
     }
     delete joinedUsers[msg.channel];
   }
+}
+
+function pluckResponse(originalMessage, type){
+  var self = ArcherBot;
+  self.db.get('SELECT id, text FROM responses WHERE type=\"'+type.toUpperCase()+'\" ORDER BY last_used ASC, RANDOM() LIMIT 1', function (err, record) {
+    if (err) {
+      return console.error('DATABASE ERROR:', err);
+    }
+    self.prototype._postMessage(originalMessage, record.text);
+    self.db.run('UPDATE responses SET last_used = ? WHERE id = ?', [new Date().valueOf(), record.id]);
+  });
 }
 
 module.exports = ArcherBot;
