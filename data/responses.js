@@ -6,6 +6,7 @@ var phrasing = [
   'https://giphy.com/gifs/archer-dance-happy-BmX38GoChnxRe',
   'http://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-10.gif',
   'I swear to god I had something for this.',
+  'Damn it, I had something for this!',
   'Uh... Phrasing!',
   'PHRASING!',
   'Oh. My. God. Hello? Are we still doing PHRASING?!',

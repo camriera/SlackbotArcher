@@ -53,4 +53,17 @@ $ npm start
 
 Don't forget to set your `BOT_API_KEY` environment variable bedore doing so. Alternatively you can also create a file called `token.js` in the root folder and put your token there (you can use the `token.js.example` file as a reference).
 
+## Heroku Cloud Hosting
+
+Optional cloud service provider that has free tier hosting for your bot. Click the link below and create an account, set your BOT_API_TOKEN and you are good to go!
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+Note: After scaling up your app, you may need to switch the DYNO to a `worker` instance, instead of `web` (default) as the app may crash if it never binds to a port (which you don't need)
+I found a work around for this problem by running these commands:
+
+```bash
+heroku ps:scale web=0
+heroku ps:scale worker=1
+```
+What I did there, was scale down the default DYNO that is spun up (web) and converted that to a worker DYNO instance which does not require any port bindings
