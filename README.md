@@ -59,11 +59,10 @@ Optional cloud service provider that has free tier hosting for your bot. Click t
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-Note: After scaling up your app, you may need to switch the DYNO to a `worker` instance, instead of `web` (default) as the app may crash if it never binds to a port (which you don't need)
-I found a work around for this problem by running these commands:
+Note: After scaling up your app, you may need to switch the DYNO to a `worker` instance, instead of `web` (default) as the app may crash if it never binds to a port (which you don't need). If you find the app crashing after 60 seconds, you can run these commands:
 
 ```bash
-heroku ps:scale web=0
-heroku ps:scale worker=1
+$ heroku ps:scale web=0
+$ heroku ps:scale worker=1
 ```
-What I did there, was scale down the default DYNO that is spun up (web) and converted that to a worker DYNO instance which does not require any port bindings
+This scales down the default DYNO (web) and spins up a worker DYNO instance which does not require any port bindings.

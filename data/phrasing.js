@@ -4,6 +4,9 @@
 
 'use strict';
 
+const PHRASING_TRIGGER_POINT_VAL = 10;
+const SENTENCE_REGEXP =  new RegExp('[^\.!\?]+[\.!\?]+', 'g');
+
 var adjectives = {
   'hard': 7,
   'soft': 3,
@@ -45,7 +48,7 @@ var adjectives = {
   'large': 4,
   'thin': 2,
   'purple': 2,
-  'blonde': 5,
+  'blond': 5,
   'asian': 4,
   'vigorously': 5,
   'hardening': 5
@@ -56,10 +59,7 @@ var nouns = {
   'anal': 5,
   'asshole': 5,
   'ball': 4,
-  'balls': 5,
   'boob': 4,
-  'boobies': 4,
-  'boobs': 4,
   'seed': 5,
   'blood': 3,
   'rock': 3,
@@ -154,30 +154,79 @@ var verbs = {
   'erupt': 6,
   'spurt': 6,
   'explode': 6,
-  'came':3,
-  'come':3,
+  'came': 3,
+  'come': 3,
+  'coming': 5,
   'ooze': 3,
   'pull': 5,
   'tug': 5,
   'jack': 5,
   'jerk': 5,
-  'grind': 4,
+  'grind': 4
 };
 
-var totalPhrasingScore = function(msg){
-  var words = msg.split(' ');
+var phrases = [
+  '(you|he|she)\\scoming\\?',
+  'hard\\sat\\swork'
+  //TODO add more direct phrasing triggers
+];
+
+/**
+ * Tests the sentences for phrasing
+ * @param msg
+ * @param TRIGGER_VAL
+ * @returns {boolean}
+ */
+var isPhrasing = function (msg, TRIGGER_VAL) {
+    var isSentencePhrasing = false;
+    var sentences = msg.match(SENTENCE_REGEXP);
+    if(!sentences || sentences.length === 0){
+      sentences = [msg];
+    }
+
+    for(var i = 0, length = sentences.length; i < length; i++){
+      var sentence = sentences[i];
+      var pointVal = 0;
+      var words = sentence.split(' ');
+      for(var j = 0, _length = words.length; j < _length; j++){
+        var word = words[j];
+        pointVal += calcPhrasingScore(adjectives, word, pointVal);
+        pointVal += calcPhrasingScore(verbs, word, pointVal);
+        pointVal += calcPhrasingScore(nouns, word, pointVal);
+      }
+
+      if(pointVal >= TRIGGER_VAL){
+        isSentencePhrasing = true;
+        break;
+      }
+    }
+
+    for(var i = 0, length = phrases.length; i < length; i++){
+      var phrase = new RegExp(phrases[i], 'gi');
+      if(phrase.test(msg)){
+        isSentencePhrasing = true;
+        break;
+      }
+    }
+
+    return isSentencePhrasing;
+};
+
+function calcPhrasingScore (wordMap, word) {
   var pointVal = 0;
-  words.forEach(function (word) {
-    pointVal += adjectives[word] || 0;
-    pointVal += nouns[word] || 0;
-    pointVal += verbs[word] || 0;
+  Object.keys(wordMap).forEach(function (key) {
+    var regexp = new RegExp(key, 'gi');
+    if(regexp.test(word)){
+      pointVal += wordMap[key];
+    }
   });
   return pointVal;
-};
+}
 
 module.exports = {
   adjectives : adjectives,
   nouns: nouns,
   verbs: verbs,
-  phrasingScore: totalPhrasingScore,
+  phrases: phrases,
+  isPhrasing: isPhrasing
 };

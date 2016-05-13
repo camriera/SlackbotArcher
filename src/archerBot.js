@@ -104,7 +104,7 @@ ArcherBot.prototype._onMessage = function (message) {
  * @private
  */
 ArcherBot.prototype._isTriggerPhrasingResponse = function (message) {
-  return phrasing.phrasingScore(message.text) >= PHRASING_TRIGGER_POINT_VAL;
+  return phrasing.isPhrasing(message.text, PHRASING_TRIGGER_POINT_VAL);
 };
 
 /**
