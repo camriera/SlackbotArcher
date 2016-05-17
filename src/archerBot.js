@@ -53,9 +53,11 @@ ArcherBot.prototype.run = function () {
  */
 ArcherBot.prototype._onStart = function () {
   this._loadBotUser();
-  console.log('archer bot: ' + this.user);
   this._connectDb();
   //this._welcomeMessage();
+
+  console.log('Archer bot:\n');
+  console.dir(this.user);
 };
 
 /**
@@ -200,7 +202,6 @@ ArcherBot.prototype._loadBotUser = function () {
   this.user = this.users.filter(function (user) {
     return user.name === self.name;
   })[0];
-  console.log('Bot details: '+this.user);
 };
 
 /**

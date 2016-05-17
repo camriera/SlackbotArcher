@@ -215,7 +215,7 @@ var isPhrasing = function (msg, TRIGGER_VAL) {
 function calcPhrasingScore (wordMap, word) {
   var pointVal = 0;
   Object.keys(wordMap).forEach(function (key) {
-    var regexp = new RegExp(key, 'gi');
+    var regexp = new RegExp('^'+key, 'gi');
     if(regexp.test(word)){
       pointVal += wordMap[key];
     }
