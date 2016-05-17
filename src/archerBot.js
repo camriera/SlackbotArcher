@@ -68,34 +68,57 @@ ArcherBot.prototype._onStart = function () {
 ArcherBot.prototype._onMessage = function (message) {
   if (this._isChatMessage(message) && this._isChannelGroupOrDMConversation(message) && !this._isFromArcherBot(message)) {
     console.log(message);
+
+    //JOIN EVENT
     if (this._isChannelOrGroupJoin(message)) {
-      addJoinedUser(message);
-      this._replyWithDangerZoneDiatribe(message);
+      if(chance(60)){
+        addJoinedUser(message);
+        this._replyWithDangerZoneDiatribe(message);
+      }
+      else if(chance(70)){
+        this._replyWithResponse('JOIN', message);
+      }
     }
+
+    //LEAVE EVENT
     else if (this._isChannelOrGroupLeave(message)){
       if(this._isFromNewlyJoinedUser(message)){
         removeJoinedUser(message);
       }
-      this._replyWithResponse('LEAVE', message);
+
+      if(chance(65)){
+        this._replyWithResponse('LEAVE', message);
+      }
     }
+
+    //CHECK RESPONSE FROM NEWLY JOINED USER
     else if (this._isFromNewlyJoinedUser(message)) {
       if (JOIN_RESPONSE.test(message.text)) {
-        this._replyWithResponse('JOIN', message);
+        this._replyWithResponse('DIATRIBE', message);
         removeJoinedUser(message);
       }
     }
+
+    //CHECK FOR PHRASING
     else if (this._isTriggerPhrasingResponse(message)) {
       this._replyWithResponse('PHRASING', message);
     }
+
+    //CHECK FOR DANGER_ZONE
     else if(this._isTriggerDangerZoneResponse(message)) {
       this._replyWithResponse('DANGER_ZONE', message);
     }
+
+    //CHECK FOR CANT/WONT
     else if (this._isTriggerCantWont(message)) {
       this._postMessage(message, 'Can\'t or won\'t?');
     }
+
+    //CHECK FOR BOT NAME MENTION
     else if (this._isMentioningArcher(message)) {
       this._replyWithResponse('RANDOM', message);
     }
+
   }
 };
 
@@ -479,5 +502,15 @@ function pluckResponse(originalMessage, type){
     self.db.run('UPDATE responses SET last_used = ? WHERE id = ?', [new Date().valueOf(), record.id]);
   });
 }
+
+/**
+ * Takes percent (0-100) of occurrance, returns true if random generation is within range
+ * @param percent
+ * @returns {boolean}
+ */
+function chance(percent){
+  return Math.ceil(Math.random() * 100) <= percent;
+}
+
 
 module.exports = ArcherBot;

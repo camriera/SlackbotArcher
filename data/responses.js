@@ -17,7 +17,7 @@ var phrasing = [
   'https://giphy.com/gifs/archer-sterling-VaWZIxqTkzKsU\nAh, PHRASING!'
 ];
 
-var joinEvt = [
+var diatribeResponse = [
   'https://giphy.com/gifs/archer-fx-sterling-cbAb0vWhJqA2k',
   'https://giphy.com/gifs/archer-skytanic-danger-zone-H8iL56bXGjVE4',
   'https://giphy.com/gifs/archer-space-race-danger-zone-xGbA1gRCAj1jW',
@@ -29,6 +29,15 @@ var joinEvt = [
   'https://giphy.com/gifs/archer-reactiongifs-mrw-Kz420G0aGw5mU',
   'Danger zone. Duh!\nHaven\'t you ever seen Top Gun? Or like heard of legendary rock singer, songwriter, guitarist Kenny Freakin\' Loggins!?',
   'DANGER ZONE!'
+];
+
+var joinEvt = [
+  'How -- hey! Just talking about you, and about how this isn\'t what it looks like.',
+  'ITS LIKE SEEING THE FACE OF GOD!',
+  'https://m.popkey.co/0e15f2/47D7R.gif',
+  'Ugh, continuing the circle of WHY BOTHER!'
+  //'Hah heh Aahahaaa. IT thinks its people!',
+  //'And now we are all dumber'
 ];
 
 var dangerZone = [
@@ -97,6 +106,10 @@ function all(){
     allResponses.push({type: 'PHRASING', text: phraseResp});
   });
 
+  diatribeResponse.forEach(function (joinResp) {
+    allResponses.push({type: 'DIATRIBE', text: joinResp});
+  });
+
   joinEvt.forEach(function (joinResp) {
     allResponses.push({type: 'JOIN', text: joinResp});
   });
@@ -123,11 +136,12 @@ function all(){
 module.exports = {
   all: all(),
   phrasing: phrasing,
-  joinEvt: joinEvt,
+  diatribeResponse: diatribeResponse,
   dangerZone: dangerZone,
   cantWont: cantWont,
   random: random,
   derogatory: derogatory,
   welcome: welcomeMsg,
+  joinEvt: joinEvt,
   leaveEvt: leaveEvt
 };
