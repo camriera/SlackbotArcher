@@ -42,6 +42,8 @@ The SlackbotArcher is configurable through environment variables. There are seve
 |----------------------|-------------|
 | `BOT_API_KEY` | this variable is mandatory and must be used to specify the API token needed by the bot to connect to your Slack organization |
 | `BOT_NAME` | the name of your bot, it’s optional and it will default to archer |
+| `BOT_DB_PATH` | the path to your DB that hosts responses, etc |
+
 
 ## Launching the bot from source
 
