@@ -67,4 +67,10 @@ Note: After scaling up your app, you may need to switch the DYNO to a `worker` i
 $ heroku ps:scale web=0
 $ heroku ps:scale worker=1
 ```
+
 This scales down the default DYNO (web) and spins up a worker DYNO instance which does not require any port bindings.
+
+Additionally, if you don't commit your API Token (Which you should definitely Git ignore) you can configure the environment variable for Heroku with:
+```bash
+$ heroku config:set BOT_API_KEY=[your-key-here]
+```
