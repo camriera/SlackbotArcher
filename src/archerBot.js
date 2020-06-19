@@ -7,6 +7,7 @@ var responses = require('../data/responses');
 var SQLite = require('sqlite3').verbose();
 var Bot = require('slackbots');
 
+var PHRASING_TRIGGER_POINT_VAL = 10;
 var CANT_WONT_REGEXP = (/(i|we)\s(cant|can’t)/ig);
 var JOIN_RESPONSE = (/wh*?a+t|yes|yeah?|shut.*up|wu+t|no/ig);
 var VOWEL_REGEXP = (/a|e|i|o|u|y/ig);

@@ -6,7 +6,7 @@ var path = require('path');
 var sqlite3 = require('sqlite3').verbose();
 var outputFile = process.argv[2] || path.resolve(__dirname, 'archerbot.db');
 var db = new sqlite3.Database(outputFile);
-var responses = require('../data/responses');
+var responses = require('../data/responses')(process.env.BOT_USE_GIFS || true);
 
 db.serialize(function () {
   console.log('Serializing DB...');
@@ -26,7 +26,7 @@ db.serialize(function () {
 
   console.log('Seeding responses table...');
   var stmt = db.prepare("INSERT INTO responses(id, type, text, last_used) VALUES (?, ?, ?, ?)");
-  responses.all().forEach(function (response) {
+  responses.all.forEach(function (response) {
     stmt.run(null, response.type, response.text, 0);
   });
   stmt.finalize();

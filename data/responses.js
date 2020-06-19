@@ -142,34 +142,51 @@ const leaveEvtGifs = [
 const welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
   '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. It\'s not like I\'m your servant like Woodhouse.';
 
-function all(){
+
+function buildResponses(useGIFs) {
+  return {
+    phrasing : useGIFs ? [...phrasing, ...phrasingGifs] : phrasing,
+    diatribeResponse : useGIFs ? [...diatribeResponse, ...diatribeResponseGifs] : diatribeResponse,
+    dangerZone : useGIFs ? [...dangerZoneResponse, ...dangerZoneGifs] : dangerZoneResponse,
+    random : useGIFs ? [...random, ...randomGifs] : random,
+    joinEvt : useGIFs ? [...joinEvt, ...joinEvtGifs] : joinEvt,
+    leaveEvt : useGIFs ? [...leaveEvt, ...leaveEvtGifs] : leaveEvt,
+    rampage : useGIFs ? [...rampage, ...rampageGifs] : rampage,
+    cantWont,
+    welcomeMsg
+  }
+}  
+
+function all(useGIFs) {
   const allResponses = [];
 
-  phrasing.forEach(function (phraseResp) {
+  const responses = buildResponses(useGIFs);
+
+  responses.phrasing.forEach(function (phraseResp) {
     allResponses.push({type: 'PHRASING', text: phraseResp});
   });
 
-  diatribeResponse.forEach(function (joinResp) {
+  responses.diatribeResponse.forEach(function (joinResp) {
     allResponses.push({type: 'DIATRIBE', text: joinResp});
   });
 
-  joinEvt.forEach(function (joinResp) {
+  responses.joinEvt.forEach(function (joinResp) {
     allResponses.push({type: 'JOIN', text: joinResp});
   });
 
-  leaveEvt.forEach(function (leaveResp) {
+  responses.leaveEvt.forEach(function (leaveResp) {
     allResponses.push({type: 'LEAVE', text: leaveResp});
   });
 
-  dangerZone.forEach(function (dangerZoneResp) {
+  responses.dangerZone.forEach(function (dangerZoneResp) {
     allResponses.push({type: 'DANGER_ZONE', text: dangerZoneResp});
   });
 
-  rampageGifs.forEach(function (rampageResp) {
+  responses.rampage.forEach(function (rampageResp) {
     allResponses.push({type: 'RAMPAGE', text: rampageResp})
   })
 
-  random.forEach(function (randomResp){
+  responses.random.forEach(function (randomResp){
     allResponses.push({type: 'RANDOM', text: randomResp});
   });
 
@@ -177,16 +194,7 @@ function all(){
 }
 
 module.exports = function (useGIFs) {
-  return {
-    all: all(),
-    phrasing: useGIFs ? [...phrasing, ...phrasingGifs] : phrasing,
-    diatribeResponse: useGIFs ? [...diatribeResponse, ...diatribeResponseGifs] : diatribeResponse,
-    dangerZone: useGIFs ? [...dangerZoneResponse, ...dangerZoneGifs] : dangerZoneResponse,
-    cantWont: cantWont,
-    random: useGIFs ? [...random, ...randomGifs] : random,
-    welcome: welcomeMsg,
-    joinEvt: useGIFs ? [...joinEvt, ...joinEvtGifs] : joinEvt,
-    leaveEvt: useGIFs ? [...leaveEvt, ...leaveEvtGifs] : leaveEvt,
-    rampage: useGIFs ? [...rampage, ...rampageGifs] : rampage
-  }
-};
+  const responses = buildResponses(useGIFs);
+  responses.all = all(useGIFs);
+  return responses;
+}
