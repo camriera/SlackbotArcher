@@ -2,9 +2,7 @@
  * Created by cameronriera on 4/21/16.
  */
 
-var phrasing = [
-  'https://giphy.com/gifs/archer-dance-happy-BmX38GoChnxRe',
-  'http://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-10.gif',
+const phrasing = [
   'I swear to god I had something for this.',
   'Damn it, I had something for this!',
   'Uh... Phrasing!',
@@ -14,44 +12,71 @@ var phrasing = [
   'Why are we not still doing phrasing?',
   'Er, phrasing.',
   'Phrasing!\nAlso, has anyone seen Woodhouse?',
-  'https://giphy.com/gifs/archer-sterling-VaWZIxqTkzKsU\nAh, PHRASING!'
 ];
 
-var diatribeResponse = [
+const phrasingGifs = [
+  'https://giphy.com/gifs/archer-dance-happy-BmX38GoChnxRe',
+  'http://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-10.gif',
+  'https://giphy.com/gifs/archer-sterling-VaWZIxqTkzKsU\nAh, PHRASING!',
+  'https://tenor.com/view/archer-sterling-archer-drink-drinking-chug-gif-5244712',
+  'https://tenor.com/view/archer-sterling-gif-5414245',
+  'https://tenor.com/view/archer-phrasing-gif-6179878',
+  'https://tenor.com/view/phrasing-words-wording-boom-archer-gif-5458260'
+];
+
+const diatribeResponse = [
+  'Paging Kenny Loggins because you\'re in the *DANGER ZONE!*',
+  'Danger zone. Duh!\nHaven\'t you ever seen Top Gun? Or like heard of legendary rock singer, songwriter, guitarist Kenny Freakin\' Loggins!?',
+  '🎵 DANGER ZONE! 🎵'
+];
+
+const diatribeResponseGifs = [
   'https://giphy.com/gifs/archer-fx-sterling-cbAb0vWhJqA2k',
   'https://giphy.com/gifs/archer-skytanic-danger-zone-H8iL56bXGjVE4',
   'https://giphy.com/gifs/archer-space-race-danger-zone-xGbA1gRCAj1jW',
-  'https://giphy.com/gifs/archer-sterling-danger-zone-12esT7y9VVi7YY',
-  'https://giphy.com/gifs/archer-sterling-danger-zone-1KjHBUoGbeN9e',
-  'http://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-11.gif',
-  'https://giphy.com/gifs/archer-bryan-cranston-IDPJpueOB5VE4',
-  'Paging Kenny Loggins because you\'re in the *DANGER ZONE!*',
   'https://giphy.com/gifs/archer-reactiongifs-mrw-Kz420G0aGw5mU',
-  'Danger zone. Duh!\nHaven\'t you ever seen Top Gun? Or like heard of legendary rock singer, songwriter, guitarist Kenny Freakin\' Loggins!?',
-  'DANGER ZONE!'
+  'https://giphy.com/gifs/archer-lana-sterling-7WqaymtUo9qFO',
+  'https://tenor.com/view/highfive-archer-cyril-topgun-gif-5655940',
+  'https://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-11.gif',
 ];
 
-var joinEvt = [
+const joinEvt = [
   'How -- hey! Just talking about you, and about how this isn\'t what it looks like.',
   'ITS LIKE SEEING THE FACE OF GOD!',
-  'https://m.popkey.co/0e15f2/47D7R.gif',
-  'Ugh, continuing the circle of WHY BOTHER!'
-  //'Hah heh Aahahaaa. IT thinks its people!',
+  'Ugh, continuing the circle of WHY BOTHER!',
+  'Hah heh Aahahaaa. IT thinks its people!',
+  'Great. Way to keep a low profile.',
+  'Well that\'s just great.',
+  'Oh, c\'mon, are you kidding me?! You\'re really gonna leave me out here?!'
   //'And now we are all dumber'
 ];
 
-var dangerZone = [
-  'http://giphy.com/gifs/archer-danger-zone-uyAwhtcreKlS8',
-  'http://giphy.com/gifs/archer-sterling-danger-zone-FZvDN82t81A0o',
-  'http://giphy.com/gifs/archer-sterling-danger-zone-FzZmhc3JDGo9O',
-  'http://giphy.com/gifs/archer-top-gun-fx-De5Lfx0LI1SjS',
-  'http://giphy.com/gifs/archer-top-gun-fx-10K5qB48ijXneE',
-  'https://giphy.com/gifs/archer-top-gun-iByd2dFdFwKn6'
+const joinEvtGifs = [
+  'https://m.popkey.co/0e15f2/47D7R.gif',
+  'https://giphy.com/gifs/hulu-fx-archer-l2SpYMbkUKDLKy25i',
+  'https://giphy.com/gifs/archerfx-archer-archerfxx-disconcerting-RhfQibBWggMZMLlRdl',
+  'https://tenor.com/view/archer-sterling-archer-jesus-christ-can-the-mind-vomit-mind-gif-5069168',
+  'https://tenor.com/view/archer-sterling-archer-theres-not-enough-liquor-and-therapy-undo-gif-5180168',
+  'https://tenor.com/view/archer-gif-5965699',
+  'https://tenor.com/view/archer-yay-excited-gif-5502995',
+  'https://www.tvovermind.com/wp-content/uploads/2013/07/Archer-GIFs-9.gif'
 ];
 
-var cantWont = ['Can\'t or won\'t?'];
+const dangerZoneResponse = [
+  'Hey, that\'s my line',
+  'WOOOOO!!!!',
+  'God, I love Kenny Loggins.',
+];
 
-var random = [
+const dangerZoneGifs = [
+  'https://tenor.com/view/archer-lana-annoyed-danger-zone-gif-7936870',
+  'https://tenor.com/view/archer-top-gun-jet-drive-parody-gif-5469185',
+  'https://tenor.com/view/highfive-archer-cyril-topgun-gif-5655940'
+];
+
+const cantWont = ['Can\'t or won\'t?'];
+
+const random = [
   'I’m not saying I invented the turtleneck, but I was the first person to realise its potential as a tactical garment. The tactical turtleneck! The… tactleneck.',
   'Are you kidding? Dude. Bros before apparent threats to national security.',
   'Hey, we\'re out here risking our lives every—many of the days!',
@@ -66,28 +91,37 @@ var random = [
   'IT DOES KNOW MY NAME!',
   'Name-dropper',
   'Don\'t say, \"high function alcoholism\"',
-  'https://giphy.com/gifs/boys-name-FmhjPpYI83S7e',
-  'https://giphy.com/gifs/archer-Td89ybyxkPK7e',
-  'https://giphy.com/gifs/archer-DOuLOWb2jtBf2',
-  'https://giphy.com/gifs/archer-sterling-uTN071VnRYqWY',
-  'https://giphy.com/gifs/archer-sterling-archeredit-10Eb8nuefwUGLm',
-  'https://giphy.com/gifs/archer-sterling-archeredit-mE39UI0Ho8K5O',
-  'https://giphy.com/gifs/archer-sterling-archeredit-eGEojmj0cc37y',
+];
+
+const randomGifs = [
+  'https://giphy.com/gifs/archerfx-fxx-archerfxx-fxnetworks-dAQnJ2qMmMzA0tqmeG',
+  'https://giphy.com/gifs/archer-sterling-bKVmcaeGR8LF6',
+  'https://giphy.com/gifs/archer-oc-mr-6pxG2dThniE5G',
   'https://giphy.com/gifs/drinking-archer-n0SYZLVDpJ1ZK',
-  'https://giphy.com/gifs/archer-sterling-archeredit-LfCsyBOyVu3ra',
-  'http://giphy.com/gifs/angry-drunk-archer-11sV0mwXMM5sJi',
-  'http://giphy.com/gifs/archer-sterling-D6FQLH3DK4lPO',
-  'http://giphy.com/gifs/archer-5-a4vbP6DrvOvfy',
-  'https://giphy.com/gifs/archer-top-gun-fx-hb8QnDZ3DRUB2',
-  'https://giphy.com/gifs/archer-29b8vQCWhROLK\nhttps://giphy.com/gifs/archer-G61YiNHRWrYDS\nhttps://giphy.com/gifs/archer-Lq0Vauj3GZMWs'
+  'https://giphy.com/gifs/archer-sterling-D6FQLH3DK4lPO',
+  'https://giphy.com/gifs/archerfx-archerfxx-hourly-are-you-Vh8A27jp5vYtLqW4CR',
+  'https://giphy.com/gifs/archerfx-fxx-archerfxx-fxnetworks-l0RVz7WjhgZLQSgxEV',
+  'https://giphy.com/gifs/archer-reaction-akg4zTE3EDmGk',
+  'https://giphy.com/gifs/archer-lana-Avu0EklfXa5Ww',
+  'https://giphy.com/gifs/archer-boop-annoyed-BUlwrDd97bCYE',
+  'https://giphy.com/gifs/archerfx-archer-drop-l1J9RPlgAhn1ox3GM',
+  'https://giphy.com/gifs/l0RVz7WjhgZLQSgxEV',
+  'https://giphy.com/gifs/archer-reaction-n36PcpdU9bXcQ'
+]
+
+const rampage = [
+  'Did you say rampage!?',
+  'RAAAMPAGE!!! WOOOO!',
 ];
 
-var derogatory = [
-  'https://giphy.com/gifs/request-top-promo-c16UpkOrOenV6'
-];
+const rampageGifs = [
+  'https://tenor.com/view/rampage-archer-gif-4833675',
+  'https://giphy.com/gifs/archer-sterling-rampage-eSlPcitchA0Cs',
+  'https://tenor.com/view/archer-rampage-revenge-gif-8155725',
+  'https://tenor.com/view/hogs-of-war-archer-gif-11124476\nRAMPAGE!!!'
+]
 
-var leaveEvt = [
-  'https://m.popkey.co/cb43a2/OXWKY.gif',
+const leaveEvt = [
   'GOOD RIDDANCE!',
   'At least he died doing what he loved... Getting shot.',
   'Thank God for small miracles!',
@@ -95,12 +129,21 @@ var leaveEvt = [
   'HOORAY!'
 ];
 
+const leaveEvtGifs = [
+  'https://m.popkey.co/cb43a2/OXWKY.gif',
+  'https://giphy.com/gifs/hulu-fx-archer-l2Sqbc3KfIDUxou1W',
+  'https://giphy.com/gifs/archerfx-archer-archerfxx-disconcerting-RhfQibBWggMZMLlRdl',
+  'https://tenor.com/view/archer-yay-excited-gif-5502995',
+  'https://tenor.com/view/archer-typical-frustrating-frustrated-gif-11190638',
+  'https://tenor.com/view/archer-gif-9632983\nHere, you were just leaving!',
+  'https://tenor.com/view/archer-sterling-archer-pam-poovey-drink-drinking-gif-5121382'
+];
 
-var welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
+const welcomeMsg = 'Was anyone looking for the worlds greatest secret agent?' +
   '\n If not, just say my name `Sterling` or `Archer` and I\'ll be there... or not. It\'s not like I\'m your servant like Woodhouse.';
 
 function all(){
-  var allResponses = [];
+  const allResponses = [];
 
   phrasing.forEach(function (phraseResp) {
     allResponses.push({type: 'PHRASING', text: phraseResp});
@@ -122,26 +165,28 @@ function all(){
     allResponses.push({type: 'DANGER_ZONE', text: dangerZoneResp});
   });
 
+  rampageGifs.forEach(function (rampageResp) {
+    allResponses.push({type: 'RAMPAGE', text: rampageResp})
+  })
+
   random.forEach(function (randomResp){
     allResponses.push({type: 'RANDOM', text: randomResp});
-  });
-
-  derogatory.forEach(function (derogatoryResp) {
-    allResponses.push({type: 'DEROGATORY', text: derogatoryResp});
   });
 
   return allResponses;
 }
 
-module.exports = {
-  all: all(),
-  phrasing: phrasing,
-  diatribeResponse: diatribeResponse,
-  dangerZone: dangerZone,
-  cantWont: cantWont,
-  random: random,
-  derogatory: derogatory,
-  welcome: welcomeMsg,
-  joinEvt: joinEvt,
-  leaveEvt: leaveEvt
+module.exports = function (useGIFs) {
+  return {
+    all: all(),
+    phrasing: useGIFs ? [...phrasing, ...phrasingGifs] : phrasing,
+    diatribeResponse: useGIFs ? [...diatribeResponse, ...diatribeResponseGifs] : diatribeResponse,
+    dangerZone: useGIFs ? [...dangerZoneResponse, ...dangerZoneGifs] : dangerZoneResponse,
+    cantWont: cantWont,
+    random: useGIFs ? [...random, ...randomGifs] : random,
+    welcome: welcomeMsg,
+    joinEvt: useGIFs ? [...joinEvt, ...joinEvtGifs] : joinEvt,
+    leaveEvt: useGIFs ? [...leaveEvt, ...leaveEvtGifs] : leaveEvt,
+    rampage: useGIFs ? [...rampage, ...rampageGifs] : rampage
+  }
 };

@@ -7,13 +7,13 @@ var responses = require('../data/responses');
 var SQLite = require('sqlite3').verbose();
 var Bot = require('slackbots');
 
-const PHRASING_TRIGGER_POINT_VAL = 10;
 var CANT_WONT_REGEXP = (/(i|we)\s(cant|can’t)/ig);
 var JOIN_RESPONSE = (/wh*?a+t|yes|yeah?|shut.*up|wu+t|no/ig);
 var VOWEL_REGEXP = (/a|e|i|o|u|y/ig);
 var DANGER_ZONE_REGEXP =
   /((danger|peril|trouble|unsafe|deadly|precarious|risky)+.*(zone|area|place|location|spot|realm|territory|section)+|(zone|area|place|location|spot|realm|territory|section)+.*(danger|peril|trouble|unsafe|deadly|precarious|risky)+)/ig;
 
+var RAMPAGE_REGEXP = /rampage/ig;
 
 var joinedUsers = {};
 
@@ -27,11 +27,12 @@ var joinedUsers = {};
  */
 var ArcherBot = function Constructor(settings) {
   this.settings = settings;
-  this.settings.name = this.settings.name || 'archer';
+  this.settings.name = settings.name || 'archer';
   this.dbPath = settings.dbPath;
 
   this.user = null;
   this.db = null;
+  responses = responses(settings.useGIFS);
 };
 
 // inherits methods and properties from the Bot constructor
@@ -89,6 +90,12 @@ ArcherBot.prototype._onMessage = function (message) {
       if(chance(65)){
         this._replyWithResponse('LEAVE', message);
       }
+
+      if (chance(40)) {
+        const user = self._getUserById(message.user);
+        const name = user.profile.first_name || user.name;
+        this._postMessage(message, 'That is classic ' + name);
+      }
     }
 
     //CHECK RESPONSE FROM NEWLY JOINED USER
@@ -114,10 +121,17 @@ ArcherBot.prototype._onMessage = function (message) {
       this._postMessage(message, 'Can\'t or won\'t?');
     }
 
+    //CHECK FOR RAMPAGE
+    else if (this._isTriggerRampageResponse(message)) {
+      this._replyWithResponse('RAMPAGE', message);
+    }
+
     //CHECK FOR BOT NAME MENTION
     else if (this._isMentioningArcher(message)) {
       this._replyWithResponse('RANDOM', message);
     }
+
+
 
   }
 };
@@ -153,6 +167,16 @@ ArcherBot.prototype._isTriggerCantWont = function (message) {
 };
 
 /**
+ * Checks whether the message text contains value for appropriate 'RAMPAGE!' response
+ * @param message
+ * @returns {boolean}
+ * @private
+ */
+ArcherBot.prototype._isTriggerRampageResponse = function (message) {
+  return RAMPAGE_REGEXP.test(message.text);
+}
+
+/**
  * Checks whether the newest joined user replied to the group/channel for use in danger zone diatribe
  * @param message
  * @returns {boolean}
@@ -178,6 +202,12 @@ ArcherBot.prototype._replyWithRandomResponse = function (originalMessage) {
   });
 };
 
+/**
+ * Replys to a message with a tagged DB response type
+ * @param {string} type //DB Response category
+ * @param {object} originalMessage
+ * @private
+ */
 ArcherBot.prototype._replyWithResponse = function (type, originalMessage) {
   var self = this;
   self.db.get('SELECT id, text FROM responses WHERE type=? ORDER BY last_used ASC, RANDOM() LIMIT 1', type.toUpperCase(), function (err, record) {
@@ -492,6 +522,15 @@ function removeJoinedUser (msg){
   }
 }
 
+/**
+ * Takes percent (0-100) of occurrance, returns true if random generation is within range
+ * @param percent
+ * @returns {boolean}
+ */
+function chance(percent){
+  return Math.ceil(Math.random() * 100) <= percent;
+}
+
 function pluckResponse(originalMessage, type){
   var self = ArcherBot;
   self.db.get('SELECT id, text FROM responses WHERE type=\"'+type.toUpperCase()+'\" ORDER BY last_used ASC, RANDOM() LIMIT 1', function (err, record) {
@@ -502,15 +541,5 @@ function pluckResponse(originalMessage, type){
     self.db.run('UPDATE responses SET last_used = ? WHERE id = ?', [new Date().valueOf(), record.id]);
   });
 }
-
-/**
- * Takes percent (0-100) of occurrance, returns true if random generation is within range
- * @param percent
- * @returns {boolean}
- */
-function chance(percent){
-  return Math.ceil(Math.random() * 100) <= percent;
-}
-
 
 module.exports = ArcherBot;

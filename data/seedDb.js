@@ -26,7 +26,7 @@ db.serialize(function () {
 
   console.log('Seeding responses table...');
   var stmt = db.prepare("INSERT INTO responses(id, type, text, last_used) VALUES (?, ?, ?, ?)");
-  responses.all.forEach(function (response) {
+  responses.all().forEach(function (response) {
     stmt.run(null, response.type, response.text, 0);
   });
   stmt.finalize();
