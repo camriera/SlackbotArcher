@@ -8,7 +8,7 @@ He also does phrasing, and "Can't or Won't?". Mention his name and see what he d
 ![SlackbotArcher in action](slackbot-archer-in-action.png)
 
 ## Installation
-Be sure to have npm and node (`>= 0.10` version, or io.js `>= 1.0`) installed and launch:
+Be sure to have npm and node installed, version `10.15.3` or later. 
 
 ```bash
 $ npm install -g https://github.com/camriera/SlackbotArcher.git
@@ -30,7 +30,7 @@ BOT_API_KEY=secretapikey npm start
 
 ## Getting the API token for your Slack channel
 
-To allow the SlackbotArcher to connect your Slack channel you must provide him an API key. To retrieve it you need to add a new Bot in your Slack organization by visiting the following url: https://*yourorganization*.slack.com/services/new/bot, where *yourorganization* must be substituted with the name of your organization (e.g. https://*loige*.slack.com/services/new/bot). Ensure you are logged to your Slack organization in your browser and you have the admin rights to add a new bot.
+To allow the SlackbotArcher to connect your Slack channel you must provide him an API key. To retrieve it you need to add a new Bot in your Slack organization by visiting the following url: https://*yourorganization*.slack.com/services/new/bot, where *yourorganization* must be substituted with the name of your organization (e.g. https://*yourorganization*.slack.com/services/new/bot). Ensure you are logged to your Slack organization in your browser and you have the admin rights to add a new bot.
 
 You will find your API key under the field API Token, copy it in a safe place and get ready to use it.
 
