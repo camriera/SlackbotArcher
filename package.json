@@ -1,7 +1,7 @@
 {
   "name": "slackbot-archer",
   "version": "1.0.0",
-  "description": "\"Literally the greatest secret agent EVER! And yes, that was the correct usage of literally. Now literally go and fetch me a a bloody mary, 2 olives. I can't find Woodhouse anywhere!\"",
+  "description": "\"Literally the greatest secret agent EVER! And yes, that was the correct usage of literally. Now literally go and fetch me a bloody mary, 2 olives. I can't find Woodhouse anywhere!\"",
   "main": "src/archerBot.js",
   "bin": {
     "slackbot-archer": "bin/bot.js"
@@ -11,8 +11,8 @@
     "url": "https://github.com/camriera/SlackbotArcher"
   },
   "dependencies": {
-    "slackbots": "^0.5.1",
-    "sqlite3": "^3.1.3"
+    "slackbots": "0.5.3",
+    "sqlite3": "4.2.0"
   },
   "devDependencies": {},
   "scripts": {
