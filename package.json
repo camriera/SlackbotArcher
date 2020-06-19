@@ -1,8 +1,11 @@
 {
   "name": "slackbot-archer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "\"Literally the greatest secret agent EVER! And yes, that was the correct usage of literally. Now literally go and fetch me a bloody mary, 2 olives. I can't find Woodhouse anywhere!\"",
   "main": "src/archerBot.js",
+  "engines": {
+    "node": "10.15.x"
+  },
   "bin": {
     "slackbot-archer": "bin/bot.js"
   },
