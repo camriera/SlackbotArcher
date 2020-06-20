@@ -106,7 +106,8 @@ const randomGifs = [
   'https://giphy.com/gifs/archer-boop-annoyed-BUlwrDd97bCYE',
   'https://giphy.com/gifs/archerfx-archer-drop-l1J9RPlgAhn1ox3GM',
   'https://giphy.com/gifs/l0RVz7WjhgZLQSgxEV',
-  'https://giphy.com/gifs/archer-reaction-n36PcpdU9bXcQ'
+  'https://giphy.com/gifs/archer-reaction-n36PcpdU9bXcQ',
+  'https://giphy.com/gifs/archerfx-punch-fxx-archerfxx-JNmjxjfdlnuA4CZWeB'
 ]
 
 const rampage = [
